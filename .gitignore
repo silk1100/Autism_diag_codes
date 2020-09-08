@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/
+__pycache__/
+catboost_info/
+*.csv
+*.txt
+*.npy
+*.joblib
+*.log
