@@ -7,6 +7,8 @@ DATADIR_a2009s = "D:\\PhD\\Data\\a2009s\\all_data.csv"
 MAX_ITR = 1000000
 PARAM_GRID={
     'lSVM': {
+        'penalty':['l1','l2'],
+        'loss':['hinge','squared_hinge'],
         'C':[0.1,1,5, 10]
     },
     'pagg': {
@@ -18,9 +20,12 @@ PARAM_GRID={
         'solver':['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
     },
     'XGB': {
-        'min_child_weight': [1, 5, 10],
-        'gamma': [0.5, 1, 1.5, 2, 5],
-        'subsample': [0.6, 0.8, 1.0],
+        'booster':['gbtree','gblinear','dart'],
+        'learning_rate':[0.001, 0.01, 0.1, 0.3, 0.5, 1],
+        'min_child_weight': [0.1,0.5, 1, 5, 10],
+        'gamma': [0, 0.1, 0.5, 1, 1.5, 2, 5, 20, 50, 100],
+        'reg_alpha':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
+        'reg_lambda':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
         'colsample_bytree': [0.6, 0.8, 1.0],
         'max_depth': [3, 4, 5]
     },

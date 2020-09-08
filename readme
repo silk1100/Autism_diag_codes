@@ -7,7 +7,7 @@
   engineering.
 
 ** TODO 2
--- Look at the PCA components of LEFT AND RIGHT hemispheres to see if they are good representations
+-- Look at the PCA components of LEFT AND RIGHT hemispheres to see if they are good representations (Done, PCA_components_test_SIDEEXP.py)
 -- Update the data matrix to be median-IQR&median+IQR for every feat-brain region instead of median&IQR
 * Given:
     -- Should I cluster based on age, gender, and site here first?? Maybe include aspergas and Nos-
@@ -25,7 +25,8 @@
 * What if I applied Hierarchical Feature selection but instead of using obj.ranking_, I will use the positions in
 obj.grid_scores_ at which the accuracy increases as the index of features that when accumulated they improve the
 model. Create out of those features a new data matrix and fed it one more time to the feature selector algorithm and
-observe if the number of positions at which an increase in accuracy occurs increase or not.
+observe if the number of positions at which an increase in accuracy occurs increase or not. (wrong observation,
+because obj_grid_scores_ is mapped to the number of features used not for the indix of the used features).
 
 
 
