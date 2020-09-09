@@ -9,14 +9,15 @@ PARAM_GRID={
     'lSVM': {
         'penalty':['l1','l2'],
         'loss':['hinge','squared_hinge'],
-        'C':[0.1,1,5, 10]
+        'C':[0,0.1,1,5, 10]
     },
     'pagg': {
-        'C':[0.1,1,5,10], 'n_iter_no_change':[1,5,10]
+        'C':[0,0.1,1,5,10],
+        'n_iter_no_change':[1,5,10]
     },
     'lg':{
         'penalty': ['l1','l2','elasticnet','none'],
-        'C':[0.1,1,5, 10],
+        'C':[0,0.1,1,5, 10],
         'solver':['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
     },
     'XGB': {
@@ -26,8 +27,7 @@ PARAM_GRID={
         'gamma': [0, 0.1, 0.5, 1, 1.5, 2, 5, 20, 50, 100],
         'reg_alpha':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
         'reg_lambda':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
-        'colsample_bytree': [0.6, 0.8, 1.0],
-        'max_depth': [3, 4, 5]
+        'n_estimators':[50, 100, 200, 500, 1000]
     },
     'GNB': {
 
@@ -35,14 +35,12 @@ PARAM_GRID={
     'Rf': {
         'n_estimators':[50, 100, 200, 500, 1000],
         'criterion':['gini','entropy'],
-        'max_features':['auto','sqrt'],
-        'min_samples_split':[2,5,10],
-        'min_samples_leaf':[0,0.1,0.2,0.3,0.4,0.5],
+        'max_features':['sqrt','log2',None],
+        'min_samples_split':[1, 2, 5, 10],
         'bootstrap':[True,False]
-
     },
     'SVC': {
-        'C':[0.1,1,5, 10],
+        'C':[0,0.1,1,5, 10],
         'kernel':['poly','rbf','sigmoid'],
         'degree':[2,3,4,5,6],
         'gamma':['scale','auto'],
