@@ -70,6 +70,9 @@ def select_features(clc,X, y, scoring_metric, hemi=None, save_file=True, file_na
     # X_right_clean = df_rightHemi_train_corr[selected_right_feats]
     # y_left = df_leftHemi_train_corr['labels']
     # y_right = df_rightHemi_train_corr['labels']
-    select_feats = X.columns[np.where(obj.ranking_==1)[0]]
-    X_clean = X[select_feats]
+    try:
+        select_feats = X.columns[np.where(obj.ranking_==1)[0]]
+        X_clean = X[select_feats]
+    except:
+        X_clean = X[np.where(obj.ranking_==1)[0]]
     return X_clean, y, obj

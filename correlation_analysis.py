@@ -84,7 +84,14 @@ def correlation_analysis(df_hemi, corr_thresh=0.65, criteria=None):
     :param criteria: python.function
     :return df_hemi_nocollinearity: pandas.DataFrame
     """
-    age, sex = df_hemi.pop('age'), df_hemi.pop('sex')
+    agePop=False
+    sexPop=False
+    if 'age' in df_hemi.columns:
+        age = df_hemi.pop('age')
+        agePop=True
+    if 'sex' in df_hemi.columns:
+        sex = df_hemi.pop('sex')
+        sexPop=True
     corr_dict = get_corr_dict(df_hemi.drop('labels', axis=1), corr_thresh)
     selected_feats = df_hemi.columns.to_list()
     if criteria is None:
@@ -97,7 +104,10 @@ def correlation_analysis(df_hemi, corr_thresh=0.65, criteria=None):
     else:
         # TODO: implementation of various criteria
         pass
-
+    if agePop:
+        df_hemi['age'] = age
+    if sexPop:
+        df_hemi['sex'] = sex
     df_hemi_nocollinearity = df_hemi[selected_feats]
     return df_hemi_nocollinearity
 

@@ -1,6 +1,33 @@
 import pandas as pd
 
 
+def update_cols_suffix(old_feats, suffix1, suffix2):
+    updated_feats = list()
+    for feat in old_feats:
+        featL = feat.split('_')
+        morph = featL[-1]
+        if 'med' in morph:
+            morph = suffix1
+        else:
+            morph = suffix2
+        featL[-1] = morph
+        updated_feats.append('_'.join(featL))
+    # Fix for age, sex, labels
+    updated_feats[-1] = old_feats[-1]
+    updated_feats[-2] = old_feats[-2]
+    updated_feats[-3] = old_feats[-3]
+
+    return updated_feats
+
+
+def suffix1_fc(c1, c2):
+    return c1-c2
+
+
+def suffix2_fc(c1, c2):
+    return c1+c2
+
+
 def modifyMedRange2MedPlusMinusRange(df):
     """
     Convert the data representation from 1 column median, and 1 column IQR into
@@ -9,29 +36,26 @@ def modifyMedRange2MedPlusMinusRange(df):
     :return updated_df: pandas.DataFrame
     """
     old_feats = df.columns.to_list()
-    updated_feats = list()
-    for feat in old_feats:
-        featL = feat.split('_')
-        morph = featL[-1]
-        if 'med' in morph:
-            morph = "medMIQR"
-        else:
-            morph = "medPIQR"
-        featL[-1] = morph
-        updated_feats.append('_'.join(featL))
-    # Fix for age, sex, labels
-    updated_feats[-1] = old_feats[-1]
-    updated_feats[-2] = old_feats[-2]
-    updated_feats[-3] = old_feats[-3]
+    suffix1 = "medMIQR"
+    suffix2 = "medPIQR"
+    updated_feats = update_cols_suffix(old_feats, suffix1, suffix2)
     updated_df = pd.DataFrame(None, index=df.index, columns=updated_feats)
     for feat in updated_df.columns:
         if 'age' in feat or 'sex' in feat or 'labels' in feat:
+            updated_df[feat] = df[feat]
             continue
         morph, brainreg, _ = feat.split('_')
-        required_cols_from_old_df = ['_'.join([morph,brainreg,'_med']),
-                                     '_'.join([morph,brainreg,'_20-80range'])]
-        med, iqr = df[required_cols_from_old_df]
-        # updated_feats
+        required_cols_from_old_df = ['_'.join([morph,brainreg,'med']),
+                                     '_'.join([morph,brainreg,'20-80range'])]
+        med_iqr_df = df[required_cols_from_old_df]
+        if suffix1 in feat:
+            updated_df[feat] = suffix1_fc(med_iqr_df.iloc[:, 0], med_iqr_df.iloc[:, 1])
+        elif suffix2 in feat:
+            updated_df[feat] = suffix2_fc(med_iqr_df.iloc[:, 0], med_iqr_df.iloc[:, 1])
+        else:
+            raise ValueError("Updated columns have an undefined problem!")
+
+    return updated_df
 
 
 def get_left_right_hemisphere(features):
@@ -59,7 +83,7 @@ def get_left_right_hemisphere(features):
     return left_cols, right_cols
 
 
-def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111):
+def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111, updated_data=True):
     """
     This function is supposed to read the csv file, hold out testratio of the dataset for
     model's testing, split the hemisphere into 2 halfs
@@ -67,6 +91,9 @@ def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111):
     :return: tuple - (left_hemisphere_dataframe, right_hemisphere_dataframe, test_dataframe)
     """
     df = pd.read_csv(fldr, index_col=0)
+    if updated_data:
+        df = modifyMedRange2MedPlusMinusRange(df)
+
     df_asd, df_td = df[df['labels']==1], df[df['labels']==0]
     assert(df_asd.columns.to_list() == df_td.columns.to_list())
 
@@ -93,7 +120,8 @@ def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111):
 
 def main():
     df = pd.read_csv("D:\\PhD\\Data\\aparc\\all_data.csv", index_col=0)
-    modifyMedRange2MedPlusMinusRange(df)
+    updated_df = modifyMedRange2MedPlusMinusRange(df)
+    updated_df.to_csv('new_aparc.csv')
 
 
 if __name__ == '__main__':

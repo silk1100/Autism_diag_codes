@@ -1,3 +1,8 @@
+
+This branch uses the same pipeline for different feature representation:
+Instead of median and IQR for each morphological feature of every brain region,
+I use median-IQR and median+IQR for each morphological feature of every brain region
+
 ** TODO
 * Split the brain into 2 hemispheres (checked)
 * For each hemisphere apply correlation analysis (checked)
