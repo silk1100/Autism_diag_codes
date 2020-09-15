@@ -21,13 +21,12 @@ PARAM_GRID={
     },
     'XGB': {
         'booster':['gbtree','gblinear','dart'],
-        'learning_rate':[0.001, 0.01, 0.1, 0.3, 0.5, 1],
-        'min_child_weight': [0.1,0.5, 1, 5, 10],
-        'gamma': [0, 0.1, 0.5, 1, 1.5, 2, 5, 20, 50, 100],
-        'reg_alpha':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
-        'reg_lambda':[0, 0.001, 0.01, 0.1, 0.5, 1, 5, 10],
+        'learning_rate':[0.001, 0.01, 0.5, 1],
+        'min_child_weight': [0.01, 0.5, 1, 10],
+        'gamma': [0, 0.1, 1, 5, 50, 100],
+        'reg_alpha':[0, 0.001, 0.5, 1, 10],
+        'reg_lambda':[0, 0.001, 0.5, 1,  10],
         'colsample_bytree': [0.6, 0.8, 1.0],
-        'max_depth': [3, 4, 5]
     },
     'GNB': {
 
@@ -46,7 +45,7 @@ PARAM_GRID={
         'kernel':['poly','rbf','sigmoid'],
         'degree':[2,3,4,5,6],
         'gamma':['scale','auto'],
-        'coef0':[0.0,0.01,0.1,0.5,1,5,10,50,100]
+        'coef0':[0.0,0.01,0.5,5,50,100]
     },
     'nn':{
         'hidden_layer_sizes': [(150,100,50,), (100,50,25,), (100,)],

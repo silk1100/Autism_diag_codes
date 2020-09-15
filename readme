@@ -3,27 +3,38 @@ This branch uses the same pipeline for different feature representation:
 Instead of median and IQR for each morphological feature of every brain region,
 I use median-IQR and median+IQR for each morphological feature of every brain region
 
+*** General Notes
+* Correct data for age, sex, site, and/or IQ
+* Create another train-test split before feature selection
+* All future analysis will be performed using median-IQR & median+IQR representation
+
 ** TODO
 * Split the brain into 2 hemispheres (checked)
 * For each hemisphere apply correlation analysis (checked)
-* Perform RF Feature selection
+* Perform RF Feature selection (checked)
 * Evaluate the selected features generalizability on various models
 * Compare the resulted model by the output of pycaret on the raw data without any feature
   engineering.
 
 ** TODO 2
 -- Look at the PCA components of LEFT AND RIGHT hemispheres to see if they are good representations (Done, PCA_components_test_SIDEEXP.py)
--- Update the data matrix to be median-IQR&median+IQR for every feat-brain region instead of median&IQR
+-- Update the data matrix to be median-IQR&median+IQR for every feat-brain region instead of median&IQR (Done, it showed more promising results that the regular data representation).
 * Given:
     -- Should I cluster based on age, gender, and site here first?? Maybe include aspergas and Nos-
     - Training and testing data matrices split into right and left semi-hemisphere in ./Results/INITIAL_SPLIT
     -- Should I split the training set training-validation sets here as well??
     - Removing correlated features from the training matrix (Left, right) in ./Results/CORR_ANA
-    -- I didn't normalize the features before I feed them to SVM --
+    -- I didn't normalize the features before I feed them to SVM -- (fixed)
     - RFECV-SVM, RFECV-RF on each uncorrelated feature resulted left_SVM, right_SVM, left_RF, right_RF
     -- How different are the selected features from SVM and RF, and from LEFT AND RIGHT? (Done, answer in
         scores_dict_analysis.ipynb)
     -
+
+** TODO 3
+* skip correlation analysis step and use only FS algorithm
+* skip FS algorithm and use only correlation analysis step
+* Compare the results of the previous 2 steps to the result with both of them combined
+* Apply different fusion on left and right hemisphere decisions
 
 
 ** Observations
@@ -31,7 +42,7 @@ I use median-IQR and median+IQR for each morphological feature of every brain re
 obj.grid_scores_ at which the accuracy increases as the index of features that when accumulated they improve the
 model. Create out of those features a new data matrix and fed it one more time to the feature selector algorithm and
 observe if the number of positions at which an increase in accuracy occurs increase or not. (wrong observation,
-because obj_grid_scores_ is mapped to the number of features used not for the indix of the used features).
+because obj_grid_scores_ is mapped to the number of features used not for the index of the used features).
 
 
 

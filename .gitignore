@@ -7,3 +7,4 @@ catboost_info/
 *.npy
 *.joblib
 *.log
+*.zip
