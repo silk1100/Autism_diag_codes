@@ -46,7 +46,7 @@ def select_features(clc,X, y, scoring_metric, hemi=None, save_file=True, file_na
     # obj_right = RFECV(rf, verbose=True, scoring='balanced_accuracy', n_jobs=-1)
     # Xupdated = X
     # for _ in range(3):
-    obj = RFECV(clc, cv=10, verbose=True, scoring=scoring_metric, n_jobs=-1)
+    obj = RFECV(clc, cv=10, verbose=3, scoring=scoring_metric, n_jobs=-1)
     obj.fit(X, y)
         # best_feats = Xupdated.columns[np.where(obj.ranking_==1)[0]]
         # Xupdated = Xupdated[best_feats]

@@ -78,10 +78,10 @@ def LOAD_FS_RESULTS():
     y_left = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT, "left_train.csv"), index_col=1)['labels']
     y_right = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT, "right_train.csv"), index_col=1)['labels']
 
-    obj_left_svc = load(os.path.join(OUTPUT_DIR_FS,"left_svc.joblib"))
-    obj_right_svc = load(os.path.join(OUTPUT_DIR_FS,"right_svc.joblib"))
-    obj_left_rf = load(os.path.join(OUTPUT_DIR_FS,"left_rf.joblib"))
-    obj_right_rf = load(os.path.join(OUTPUT_DIR_FS,"right_rf.joblib"))
+    obj_left_svc = load(os.path.join(OUTPUT_DIR_FS,"left_svc_modifiedMedPIQR.joblib"))
+    obj_right_svc = load(os.path.join(OUTPUT_DIR_FS,"right_svc_modifiedMedPIQR.joblib"))
+    obj_left_rf = load(os.path.join(OUTPUT_DIR_FS,"left_rf_modifiedMedPIQR.joblib"))
+    obj_right_rf = load(os.path.join(OUTPUT_DIR_FS,"right_rf_modifiedMedPIQR.joblib"))
 
     return (X_clean_left_lsvc, X_clean_right_lsvc, X_clean_left_rf, X_clean_right_rf, y_left, y_right),\
            (obj_left_svc, obj_right_svc, obj_left_rf, obj_right_rf)
