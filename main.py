@@ -196,13 +196,13 @@ def main():
     # y_right = df_rightHemi_train_corr.pop('labels')
     #
     # X_clean_left_rf_norm = StandardScaler().fit_transform(df_leftHemi_train_corr)
-    # X_clean_right_rf_norm = StandardScaler().fit_transform(df_rightHemi_train_corr)
+    # X_clean_rig
+    #     # # # dump(clf_left_lsvc, os.pathht_rf_norm = StandardScaler().fit_transform(df_rightHemi_train_corr)
     #
     # clf_left_rf = train_models(X_clean_left_rf_norm, y_left, 5)
     # clf_right_rf = train_models(X_clean_right_rf_norm, y_right, 5)
     #
-    # #
-    # # # dump(clf_left_lsvc, os.path.join(OUTPUT_DIR_ML,clf_svm_left_file))
+    # #.join(OUTPUT_DIR_ML,clf_svm_left_file))
     # # # dump(clf_right_lsvc, os.path.join(OUTPUT_DIR_ML,clf_svm_right_file))
     # dump(clf_left_rf, os.path.join(OUTPUT_DIR_ML,f"clf_left_OnlyCorr_{corr_thresh}.joblib"))
     # dump(clf_right_rf, os.path.join(OUTPUT_DIR_ML,f"clf_right_OnlyCorr_{corr_thresh}.joblib"))

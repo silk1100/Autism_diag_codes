@@ -3,6 +3,9 @@ import os
 from joblib import load
 
 DATADIR_aparc = "D:\\PhD\\Data\\aparc\\all_data.csv"
+DATADIR_aparc_RIGHT_NEW = "D:\\PhD\\Data\\aparc\\df_right_newRepresentation.csv"
+DATADIR_aparc_LEFT_NEW = "D:\\PhD\\Data\\aparc\\df_left_newRepresentation.csv"
+
 DATADIR_a2009s = "D:\\PhD\\Data\\a2009s\\all_data.csv"
 MAX_ITR = 1000000
 PARAM_GRID={

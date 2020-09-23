@@ -3,6 +3,13 @@ This branch uses the same pipeline for different feature representation:
 Instead of median and IQR for each morphological feature of every brain region,
 I use median-IQR and median+IQR for each morphological feature of every brain region
 
+Branch RandomExperimentRepo aims to test the stability of the selected features. Last experiment from
+branch updatedDataRepo showed that the new representation of data which is median-IQR & median+IQR is more
+meaningful and even performs better than median & IQR. Moreover, the experiment has shown that RF-FS alone
+performs better than Correlation analysis alone or correlation analysis+FS. This is due to the fact that
+correlation analysis eliminates 4 features out of the 5 that FS alone pick. For more details please check
+Compare_FSALONE_VS_CORRALONE.ipynb
+
 *** General Notes
 * Correct data for age, sex, site, and/or IQ
 * Create another train-test split before feature selection

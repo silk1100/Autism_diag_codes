@@ -78,8 +78,8 @@ def get_score_dict(clc, Xtr, ytr, Xte, yte, scores_dict, key):
     return scores_dict
 
 
-def train_models(X, y, cv):
-    stratcv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=49716)
+def train_models(X, y, cv, random_state=49716):
+    stratcv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state)
     results_dict = dict()
     for clc in CLC_DIST:
         # Go check the function because I updated it to perform random search instead of exhaustive search
@@ -87,7 +87,9 @@ def train_models(X, y, cv):
         results_dict[clc] = clf
     return results_dict
 
+
 from sklearn import datasets
+
 
 def main():
     iris = datasets.load_iris()
