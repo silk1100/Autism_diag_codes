@@ -5,7 +5,7 @@ from joblib import load
 DATADIR_aparc = "D:\\PhD\\Data\\aparc\\all_data.csv"
 DATADIR_aparc_MODLEFT = "D:\\PhD\\Data\\aparc\\df_left_newRepresentation.csv"
 DATADIR_aparc_MODRight = "D:\\PhD\\Data\\aparc\\df_right_newRepresentation.csv"
-
+DATADIR_aparc_ALLASDINC = "D:\\PhD\\Data\\aparc\\df_aparc_ALLASDINC.csv"
 DATADIR_a2009s = "D:\\PhD\\Data\\a2009s\\all_data.csv"
 MAX_ITR = 1000000
 PARAM_GRID={
@@ -65,6 +65,7 @@ OUTPUT_DIR_ML = './Results/ML'
 OUTPUT_DIR_FS = './Results/FS'
 OUTPUT_DIR_CORR = './Results/CORR_ANA'
 OUTPUT_DIR_SPLIT = './Results/INITIAL_SPLIT'
+OUTPUT_DIR_site_ana = './Results/site_analysis'
 
 
 def LOAD_CORRANA_RESULTS():
@@ -215,3 +216,11 @@ SELECTED_RIGHT_SVM = ['thick_rsuperiorparietal_medPIQR',
   'vol_rsuperiortemporal_medPIQR']
 
 TARGET = 'labels'
+ASD = 1
+TD = 0
+SELECTED_FEATS_DICT = {
+    'RF-FS-LEFT': SELECTED_LEFT_RF,
+    'RF-FS-RIGHT': SELECTED_RIGHT_RF,
+    'SVM-FS-LEFT': SELECTED_LEFT_SVM,
+    'SVM-FS-RIGHT': SELECTED_RIGHT_SVM,
+}
