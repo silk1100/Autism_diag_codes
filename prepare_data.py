@@ -83,6 +83,34 @@ def get_left_right_hemisphere(features):
     return left_cols, right_cols
 
 
+def select_sites(df):
+    sites = list(set([x.split('_')[0] for x in df.index]))
+    rejected_list = []
+    accepted_list = []
+    acceptes_subjects = []
+    acc_subj = 0
+    rej_subj = 0
+    for site in sites:
+        site_subjects = [subj for subj in df.index if site in subj]
+        subdf = df.loc[site_subjects,'labels']
+        asd_cnt = len(subdf[subdf==1])
+        td_cnt = len(subdf[subdf == 0])
+        if asd_cnt < td_cnt:
+            ratio = td_cnt/(asd_cnt+td_cnt)
+        else:
+            ratio = asd_cnt / (asd_cnt + td_cnt)
+        if ratio > 0.6:
+            rejected_list.append(site)
+            rej_subj += td_cnt + asd_cnt
+        else:
+            accepted_list.append(site)
+            acceptes_subjects += site_subjects
+            acc_subj += td_cnt + asd_cnt
+
+    stdf = df.loc[acceptes_subjects, :]
+    return stdf, (accepted_list, rejected_list, acc_subj, rej_subj)
+
+
 def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111, updated_data=True):
     """
     This function is supposed to read the csv file, hold out testratio of the dataset for
@@ -96,7 +124,7 @@ def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111, updated_data=Tr
 
     df_asd, df_td = df[df['labels']==1], df[df['labels']==0]
     assert(df_asd.columns.to_list() == df_td.columns.to_list())
-
+    df = select_sites(df)
     left_cols, right_cols = get_left_right_hemisphere(df.columns)
 
     if df_asd.shape[0] > df_td.shape[0]:
@@ -119,9 +147,11 @@ def get_csvfile_ready(fldr, testratio=0.2, random_seed=11111111, updated_data=Tr
 
 
 def main():
-    df = pd.read_csv("D:\\PhD\\Data\\aparc\\all_data.csv", index_col=0)
-    updated_df = modifyMedRange2MedPlusMinusRange(df)
-    updated_df.to_csv('new_aparc.csv')
+    df = pd.read_csv("D:\\PhD\\Data\\aparc\\DrEid_brain_sMRI_lr_TDASD.csv", index_col=0)
+    # updated_df = modifyMedRange2MedPlusMinusRange(df)
+    updated_df, info = select_sites(df)
+    print(updated_df)
+    # updated_df.to_csv('new_aparc.csv')
 
 
 if __name__ == '__main__':

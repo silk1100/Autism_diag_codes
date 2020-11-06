@@ -9,8 +9,10 @@ This script needs to implement the following functions:
 """
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import constants
-from prepare_data import get_csvfile_ready
+from prepare_data import get_csvfile_ready, select_sites
+import matplotlib.pyplot as plt
 from correlation_analysis import correlation_analysis
 from joblib import dump, load
 from sklearn.svm import SVC, LinearSVC
@@ -34,50 +36,127 @@ def createDirIfNotExist_max2levels(dir):
         os.mkdir(dir)
 
 
+def split_l_r(df):
+    rcols = []
+    lcols = []
+    for col in df.columns:
+        if col.split('_')[1][0] == 'l':
+            lcols.append(col)
+        elif col.split('_')[1][0] == 'r':
+            rcols.append(col)
+        else:
+            raise ValueError(f'Undefined columns: {col}')
+    return df.loc[:, lcols], df.loc[:, rcols]
+
+
+def stat_analysis_MaterialsMethods_DataCollection_Age_Sex(df):
+    from scipy.stats import ttest_ind, chi2_contingency
+    # t-test for age
+    age_asd = df[df['labels']==1]['age'].values
+    age_td = df[df['labels']==0]['age'].values
+    print(f't-test for age between asd and td group: {ttest_ind(age_asd, age_td)}')
+
+    # Chi-square test for sex in TD group
+    td_sex_count = df[df['labels']==0]['sex'].value_counts()
+    males_td = td_sex_count[1]
+    females_td = td_sex_count[2]
+
+    td_table = [[males_td, females_td],[(males_td+females_td)//2,(males_td+females_td)//2]]
+    print(f'chi-square test for gender in TD group: {chi2_contingency(td_table)}')
+
+    # Chi-square test for sex in ASD group
+    td_sex_count = df[df['labels'] == 1]['sex'].value_counts()
+    males_asd = td_sex_count[1]
+    females_asd = td_sex_count[2]
+
+    td_table = [[males_asd, females_asd], [(males_asd + females_asd) // 2, (males_asd + females_asd) // 2]]
+    print(f'chi-square test for gender in ASD group: {chi2_contingency(td_table)}')
+
+
 def main():
-    # # Create output folders
-    # createDirIfNotExist_max2levels(OUTPUT_DIR_ML)
-    # createDirIfNotExist_max2levels(OUTPUT_DIR_SPLIT)
-    # createDirIfNotExist_max2levels(OUTPUT_DIR_FS)
-    # createDirIfNotExist_max2levels(OUTPUT_DIR_CORR)
+
+    createDirIfNotExist_max2levels(OUTPUT_DIR_ML)
+    createDirIfNotExist_max2levels(OUTPUT_DIR_SPLIT)
+    createDirIfNotExist_max2levels(OUTPUT_DIR_FS)
+    createDirIfNotExist_max2levels(OUTPUT_DIR_CORR)
+
+
+    ## Read data
+    # For every site:
+    #   If number of ASD subjects/number of td subjects>0.6 (or other wise), then drop the site
+    # Include only sites with balanced sites
+    df = pd.read_csv("D:\\PhD\\Data\\aparc\\DrEid_brain_sMRI_lr_TDASD.csv", index_col=0)
+    df, info = select_sites(df)
+    # Stats for the paper
+    stat_analysis_MaterialsMethods_DataCollection_Age_Sex(df)
+
+    # Separate unnecessary
+    age = df.pop('age')
+    sex = df.pop('sex')
+    labels = df.pop('labels')
+
+    # Split data into left and right hemisphere
+    df_l, df_r = split_l_r(df)
+
+    # Calculate the difference between left and right hemisphere (using numpy not pandas)
+    # print(np.sum(df_l.values-df_r.values)) # = 286.372303 (not zero as pandas produce)
+    # for indx, col in enumerate(df_l.columns):
+    #     print(f'Correlation coef of {col} = {np.corrcoef(df_r.iloc[:, indx].values, df_l.iloc[:, indx].values)}')
     #
+    for ind, col in enumerate(df.columns):
+        if 'area' not in col:
+            continue
+        sns.regplot(df_l.loc[labels[labels==0].index, df_l.columns[0]],df_r.loc[labels[labels==0].index, df_r.columns[0]], label='TD')
+        sns.regplot(df_l.loc[labels[labels==1].index, df_l.columns[0]],df_r.loc[labels[labels==1].index, df_r.columns[0]], label='ASD')
+
+    plt.xlim([0,0.5])
+    plt.ylim([0, 0.5])
+    plt.legend()
+    plt.show()
+    """
+    """
+
+
+    ## Perform correlation analysis
+
+
     # # Get the data ready
-    updated_data = True
+    # updated_data = True
     # df_leftHemi_train, df_rightHemi_train, df_test_left, df_test_right = \
     #     get_csvfile_ready(constants.DATADIR_aparc, testratio=0.2, random_seed=131417191,
     #                       updated_data=updated_data)
     #
     # # Check whether to save as new representation or old representation
-    if updated_data:
-        left_train_file = 'left_train_modifiedMedPIQR.csv'
-        right_train_file = 'right_train_modifiedMedPIQR.csv'
-        left_test_file = 'left_test_modifiedMedPIQR.csv'
-        right_test_file = 'right_test_modifiedMedPIQR.csv'
-        nocoll_left_file = 'left_train_noColliniarity_modifiedMedPIQR'
-        nocoll_right_file = 'right_train_noColliniarity_modifiedMedPIQR'
-        obj_svc_right_file = "right_svc_modifiedMedPIQR.joblib"
-        obj_svc_left_file = "left_svc_modifiedMedPIQR.joblib"
-        obj_rf_right_file = "right_rf_modifiedMedPIQR.joblib"
-        obj_rf_left_file = "left_rf_modifiedMedPIQR.joblib"
-        clf_svm_left_file = "clf_left_svm_modifiedMedPIQR.joblib"
-        clf_svm_right_file = "clf_right_svm_modifiedMedPIQR.joblib"
-        clf_rf_left_file = "clf_left_rf_modifiedMedPIQR.joblib"
-        clf_rf_right_file = "clf_right_rf_modifiedMedPIQR.joblib"
-    else:
-        left_train_file = 'left_train.csv'
-        right_train_file = 'right_train.csv'
-        left_test_file = 'left_test.csv'
-        right_test_file = 'right_test.csv'
-        nocoll_left_file = 'left_train_noColliniarity.csv'
-        nocoll_right_file = 'right_train_noColliniarity.csv'
-        obj_svc_right_file = "right_svc.joblib"
-        obj_svc_left_file = "left_svc.joblib"
-        obj_rf_right_file = "right_rf.joblib"
-        obj_rf_left_file = "left_rf.joblib"
-        clf_svm_left_file = "clf_left_svm.joblib"
-        clf_svm_right_file = "clf_right_svm.joblib"
-        clf_rf_left_file = "clf_left_rf.joblib"
-        clf_rf_right_file = "clf_right_rf.joblib"
+    # if updated_data:
+    #     left_train_file = 'left_train_modifiedMedPIQR.csv'
+    #     right_train_file = 'right_train_modifiedMedPIQR.csv'
+    #     left_test_file = 'left_test_modifiedMedPIQR.csv'
+    #     right_test_file = 'right_test_modifiedMedPIQR.csv'
+    #     nocoll_left_file = 'left_train_noColliniarity_modifiedMedPIQR'
+    #     nocoll_right_file = 'right_train_noColliniarity_modifiedMedPIQR'
+    #     obj_svc_right_file = "right_svc_modifiedMedPIQR.joblib"
+    #     obj_svc_left_file = "left_svc_modifiedMedPIQR.joblib"
+    #     obj_rf_right_file = "right_rf_modifiedMedPIQR.joblib"
+    #     obj_rf_left_file = "left_rf_modifiedMedPIQR.joblib"
+    #     clf_svm_left_file = "clf_left_svm_modifiedMedPIQR.joblib"
+    #     clf_svm_right_file = "clf_right_svm_modifiedMedPIQR.joblib"
+    #     clf_rf_left_file = "clf_left_rf_modifiedMedPIQR.joblib"
+    #     clf_rf_right_file = "clf_right_rf_modifiedMedPIQR.joblib"
+    # else:
+    #     left_train_file = 'left_train.csv'
+    #     right_train_file = 'right_train.csv'
+    #     left_test_file = 'left_test.csv'
+    #     right_test_file = 'right_test.csv'
+    #     nocoll_left_file = 'left_train_noColliniarity.csv'
+    #     nocoll_right_file = 'right_train_noColliniarity.csv'
+    #     obj_svc_right_file = "right_svc.joblib"
+    #     obj_svc_left_file = "left_svc.joblib"
+    #     obj_rf_right_file = "right_rf.joblib"
+    #     obj_rf_left_file = "left_rf.joblib"
+    #     clf_svm_left_file = "clf_left_svm.joblib"
+    #     clf_svm_right_file = "clf_right_svm.joblib"
+    #     clf_rf_left_file = "clf_left_rf.joblib"
+    #     clf_rf_right_file = "clf_right_rf.joblib"
     #
     # # Keep age and sex separate
     # age,_ = df_leftHemi_train.pop('age'), df_rightHemi_train.pop('age')
@@ -143,53 +222,53 @@ def main():
     # dump(obj_right_rf, os.path.join(OUTPUT_DIR_FS,obj_rf_right_file))
 
 
-
-    # Load FS data
-    frames, objs = constants.LOAD_FS_RESULTS()
-    # X_clean_left_lsvc, X_clean_right_lsvc, X_clean_left_rf, X_clean_right_rf, y_left, y_right = frames
-    df_train_left = pd.read_csv(os.path.join(OUTPUT_DIR_CORR, 'left_train_noColliniarity_modifiedMedPIQR_50.csv'), index_col=0)
-    df_train_right = pd.read_csv(os.path.join(OUTPUT_DIR_CORR, 'right_train_noColliniarity_modifiedMedPIQR_50.csv'), index_col=0)
-    obj_left_lsvc, obj_right_lsvc, obj_left_rf, obj_right_rf = objs
-    feat_select_svc_left = np.where(obj_left_lsvc.ranking_==1)[0]
-    feat_select_svc_right = np.where(obj_right_lsvc.ranking_==1)[0]
-    feat_select_rf_left = np.where(obj_left_rf.ranking_==1)[0]
-    feat_select_rf_right = np.where(obj_right_rf.ranking_==1)[0]
-
-    X_clean_right_rf = df_train_right[df_train_right.columns[feat_select_rf_right]]
-    X_clean_left_rf = df_train_left[df_train_left.columns[feat_select_rf_left]]
-    X_clean_right_lsvc = df_train_right[df_train_right.columns[feat_select_svc_right]]
-    X_clean_left_lsvc = df_train_left[df_train_left.columns[feat_select_svc_left]]
-    y_right = df_train_right['labels']
-    y_left = df_train_left['labels']
-    # Normalization if required
-    #     left_train_file = 'left_train_modifiedMedPIQR.csv'
-    #     right_train_file = 'right_train_modifiedMedPIQR.csv'
-    # X_clean_left_rf_norm = StandardScaler().fit_transform(X_clean_left_rf)
-    # X_clean_right_rf_norm = StandardScaler().fit_transform(X_clean_right_rf)
-
-
-
-    # X_clean_left_rf_norm = StandardScaler().fit_transform(X_clean_left_rf)
-    # X_clean_right_rf_norm = StandardScaler().fit_transform(X_clean_right_rf)
-    # X_clean_left_lsvc_norm = StandardScaler().fit_transform(X_clean_left_lsvc)
-    # X_clean_right_lsvc_norm = StandardScaler().fit_transform(X_clean_right_lsvc)
-
-    # clf_left_rf = train_models(X_clean_left_rf_norm, y_left, 5)
-    # clf_right_rf = train_models(X_clean_right_rf_norm, y_right, 5)
-    # clf_left_lsvc = train_models(X_clean_left_lsvc_norm, y_left, 5)
-    # clf_right_lsvc = train_models(X_clean_right_lsvc_norm, y_right, 5)
-
-    clf_left_rf = train_models(X_clean_left_rf, y_left, 5)
-    clf_right_rf = train_models(X_clean_right_rf, y_right, 5)
-    clf_left_lsvc = train_models(X_clean_left_lsvc, y_left, 5)
-    clf_right_lsvc = train_models(X_clean_right_lsvc, y_right, 5)
-
-    dump(clf_left_lsvc, os.path.join(OUTPUT_DIR_ML,"clf_left_lsvm_CORR_50.joblib"))
-    dump(clf_right_lsvc, os.path.join(OUTPUT_DIR_ML,"clf_right_lsvm_CORR_50.joblib"))
-    dump(clf_left_rf, os.path.join(OUTPUT_DIR_ML,"clf_left_RF_CORR_50.joblib"))
-    dump(clf_right_rf, os.path.join(OUTPUT_DIR_ML,"clf_right_RF_CORR_50.joblib"))
-
-    # This section is only to check correlation without FS
+    #
+    # # Load FS data
+    # frames, objs = constants.LOAD_FS_RESULTS()
+    # # X_clean_left_lsvc, X_clean_right_lsvc, X_clean_left_rf, X_clean_right_rf, y_left, y_right = frames
+    # df_train_left = pd.read_csv(os.path.join(OUTPUT_DIR_CORR, 'left_train_noColliniarity_modifiedMedPIQR_50.csv'), index_col=0)
+    # df_train_right = pd.read_csv(os.path.join(OUTPUT_DIR_CORR, 'right_train_noColliniarity_modifiedMedPIQR_50.csv'), index_col=0)
+    # obj_left_lsvc, obj_right_lsvc, obj_left_rf, obj_right_rf = objs
+    # feat_select_svc_left = np.where(obj_left_lsvc.ranking_==1)[0]
+    # feat_select_svc_right = np.where(obj_right_lsvc.ranking_==1)[0]
+    # feat_select_rf_left = np.where(obj_left_rf.ranking_==1)[0]
+    # feat_select_rf_right = np.where(obj_right_rf.ranking_==1)[0]
+    #
+    # X_clean_right_rf = df_train_right[df_train_right.columns[feat_select_rf_right]]
+    # X_clean_left_rf = df_train_left[df_train_left.columns[feat_select_rf_left]]
+    # X_clean_right_lsvc = df_train_right[df_train_right.columns[feat_select_svc_right]]
+    # X_clean_left_lsvc = df_train_left[df_train_left.columns[feat_select_svc_left]]
+    # y_right = df_train_right['labels']
+    # y_left = df_train_left['labels']
+    # # Normalization if required
+    # #     left_train_file = 'left_train_modifiedMedPIQR.csv'
+    # #     right_train_file = 'right_train_modifiedMedPIQR.csv'
+    # # X_clean_left_rf_norm = StandardScaler().fit_transform(X_clean_left_rf)
+    # # X_clean_right_rf_norm = StandardScaler().fit_transform(X_clean_right_rf)
+    #
+    #
+    #
+    # # X_clean_left_rf_norm = StandardScaler().fit_transform(X_clean_left_rf)
+    # # X_clean_right_rf_norm = StandardScaler().fit_transform(X_clean_right_rf)
+    # # X_clean_left_lsvc_norm = StandardScaler().fit_transform(X_clean_left_lsvc)
+    # # X_clean_right_lsvc_norm = StandardScaler().fit_transform(X_clean_right_lsvc)
+    #
+    # # clf_left_rf = train_models(X_clean_left_rf_norm, y_left, 5)
+    # # clf_right_rf = train_models(X_clean_right_rf_norm, y_right, 5)
+    # # clf_left_lsvc = train_models(X_clean_left_lsvc_norm, y_left, 5)
+    # # clf_right_lsvc = train_models(X_clean_right_lsvc_norm, y_right, 5)
+    #
+    # clf_left_rf = train_models(X_clean_left_rf, y_left, 5)
+    # clf_right_rf = train_models(X_clean_right_rf, y_right, 5)
+    # clf_left_lsvc = train_models(X_clean_left_lsvc, y_left, 5)
+    # clf_right_lsvc = train_models(X_clean_right_lsvc, y_right, 5)
+    #
+    # dump(clf_left_lsvc, os.path.join(OUTPUT_DIR_ML,"clf_left_lsvm_CORR_50.joblib"))
+    # dump(clf_right_lsvc, os.path.join(OUTPUT_DIR_ML,"clf_right_lsvm_CORR_50.joblib"))
+    # dump(clf_left_rf, os.path.join(OUTPUT_DIR_ML,"clf_left_RF_CORR_50.joblib"))
+    # dump(clf_right_rf, os.path.join(OUTPUT_DIR_ML,"clf_right_RF_CORR_50.joblib"))
+    #
+    # # This section is only to check correlation without FS
     # df_leftHemi_train_corr.to_csv(os.path.join(OUTPUT_DIR_CORR, f'{nocoll_left_file}_{corr_thresh}.csv'))
     # df_rightHemi_train_corr.to_csv(os.path.join(OUTPUT_DIR_CORR, f'{nocoll_right_file}_{corr_thresh}.csv'))
     # y_left = df_leftHemi_train_corr.pop('labels')

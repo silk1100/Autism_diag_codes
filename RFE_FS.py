@@ -74,5 +74,5 @@ def select_features(clc,X, y, scoring_metric, hemi=None, save_file=True, file_na
         select_feats = X.columns[np.where(obj.ranking_==1)[0]]
         X_clean = X[select_feats]
     except:
-        X_clean = X[np.where(obj.ranking_==1)[0]]
+        X_clean = X[:, np.where(obj.ranking_==1)[0]]
     return X_clean, y, obj
