@@ -92,7 +92,11 @@ def correlation_analysis(df_hemi, corr_thresh=0.65, criteria=None):
     if 'sex' in df_hemi.columns:
         sex = df_hemi.pop('sex')
         sexPop=True
-    corr_dict = get_corr_dict(df_hemi.drop('labels', axis=1), corr_thresh)
+    if 'labels' in df_hemi.columns:
+        corr_dict = get_corr_dict(df_hemi.drop('labels', axis=1), corr_thresh)
+    else:
+        corr_dict = get_corr_dict(df_hemi, corr_thresh)
+
     selected_feats = df_hemi.columns.to_list()
     if criteria is None:
         for key in corr_dict:
