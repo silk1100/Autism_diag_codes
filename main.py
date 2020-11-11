@@ -23,7 +23,7 @@ from constants import MAX_ITR, OUTPUT_DIR_CORR, OUTPUT_DIR_FS, OUTPUT_DIR_ML, OU
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import os
 from ML_model_selection import train_models
-
+from constants import  DROPBOX_API_TOKEN
 
 def createDirIfNotExist_max2levels(dir):
     """
@@ -101,6 +101,87 @@ class MyMinMax:
             self.sc = self.sc.fit(X)
             Xn = self.sc.transform(X)
         return Xn
+
+
+def loadRFEFilesFrom(morphBasedNormList):
+    rfes = ['lg1','lg2','svm','_rf.']
+    data_dict = {}
+    for rfe in rfes:
+        ytrain_corr = [x for x in morphBasedNormList if ('ytrain_corr' in x)
+                       and ("_corr_l" not in x) and ("_corr_r" not in x)]
+        assert(len(ytrain_corr) == 1)
+        ytrain_corr = ytrain_corr[0]
+
+        ytrain = [x for x in morphBasedNormList if ('ytrain' in x)
+                  and ("_corr" not in x) and ("_corr_l" not in x) and ("_corr_r" not in x)]
+
+        assert(len(ytrain) == 1)
+        ytrain = ytrain[0]
+
+        ytrain_corr_l = [x for x in morphBasedNormList if ('ytrain_corr_l' in x)]
+        assert(len(ytrain_corr_l) == 1)
+        ytrain_corr_l = ytrain_corr_l[0]
+
+
+        ytrain_corr_r = [x for x in morphBasedNormList if ('ytrain_corr_r' in x)]
+        assert(len(ytrain_corr_r) == 1)
+        ytrain_corr_r = ytrain_corr_r[0]
+
+        rfe_files = [x for x in morphBasedNormList if rfe in x]
+        Xtrain_corr_r, rfe_corr_r  = [x for x in rfe_files if ('_corr_r_' in x) and ('Xtrain' in x)], \
+                                     [x for x in rfe_files if ('_corr_r_' in x) and ('rfe' in x) and (rfe in x)]
+
+        assert(len(Xtrain_corr_r) == 1)
+        Xtrain_corr_r = Xtrain_corr_r[0]
+        assert(len(rfe_corr_r) == 1)
+        rfe_corr_r = rfe_corr_r[0]
+
+
+        Xtrain_corr_l, rfe_corr_l  = [x for x in rfe_files if ('_corr_l_' in x) and ('Xtrain' in x)], \
+                                     [x for x in rfe_files if ('_corr_l_' in x) and ('rfe' in x) and (rfe in x)]
+        assert(len(Xtrain_corr_l) == 1)
+        Xtrain_corr_l = Xtrain_corr_l[0]
+        assert(len(rfe_corr_l) == 1)
+        rfe_corr_l = rfe_corr_l[0]
+
+        Xtrain_corr, rfe_corr = [x for x in rfe_files
+                          if ('_corr_' in x) and ('_corr_l_' not in x) and ('_corr_r_' not in x)
+                                 and ('Xtrain' in x)], \
+                                [x for x in rfe_files
+                                 if ('_corr_' in x) and ('_corr_l_' not in x) and ('_corr_r_' not in x)
+                                 and ('rfe' in x) and (rfe in x)]
+        assert(len(Xtrain_corr) == 1)
+        Xtrain_corr = Xtrain_corr[0]
+        assert(len(rfe_corr) == 1)
+        rfe_corr = rfe_corr[0]
+
+        Xtrain, rfetrain = [x for x in rfe_files
+                          if ('_corr_' not in x) and ('_corr_l_' not in x) and ('_corr_r_' not in x)
+                            and ('Xtrain' in x)], \
+                           [x for x in rfe_files
+                            if ('_corr_' not in x) and ('_corr_l_' not in x) and ('_corr_r_' not in x)
+                            and ('rfe' in x) and (rfe in x)]
+
+        assert(len(Xtrain) == 1)
+        Xtrain = Xtrain[0]
+        assert(len(rfetrain) == 1)
+        rfetrain = rfetrain[0]
+
+        data_dict[rfe] = {
+            'ytrain': ytrain,
+            'ytrain_corr': ytrain_corr,
+            'ytrain_corr_l':ytrain_corr_l,
+            'ytrain_corr_r': ytrain_corr_r,
+            'Xtrain': Xtrain,
+            'Xtrain_corr': Xtrain_corr,
+            'Xtrain_corr_l': Xtrain_corr_l,
+            'Xtrain_corr_r': Xtrain_corr_r,
+            'rfetrain': rfetrain,
+            'rfe_corr': rfe_corr,
+            'rfe_corr_l': rfe_corr_l,
+            'rfe_corr_r': rfe_corr_r
+        }
+    return data_dict
 
 
 def mynormalize(df, allfeats=False):
@@ -191,8 +272,28 @@ def PIPELINE_PART2_FS():
     pass
 
 
-def PIPELINE_PART3_ML():
-    pass
+def PIPELINE_PART3_ML(morphBasedNormList):
+    data_dict = loadRFEFilesFrom(morphBasedNormList)
+    for rfe_clc in data_dict:
+        print(rfe_clc)
+        rfe_clc_data = data_dict[rfe_clc]
+        rfe_clc = rfe_clc.split('.')[0]
+
+        clf = train_models(np.load(rfe_clc_data['Xtrain'], allow_pickle=True),
+                           np.load(rfe_clc_data['ytrain'], allow_pickle=True), 5)
+        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train.joblib"))
+
+        clf = train_models(np.load(rfe_clc_data['Xtrain_corr'],allow_pickle=True),
+                           np.load(rfe_clc_data['ytrain_corr'],allow_pickle=True), 5)
+        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr.joblib"))
+
+        clf = train_models(np.load(rfe_clc_data['Xtrain_corr_l'], allow_pickle=True),
+                           np.load(rfe_clc_data['ytrain_corr_l'],allow_pickle=True), 5)
+        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_l.joblib"))
+
+        clf = train_models(np.load(rfe_clc_data['Xtrain_corr_r'], allow_pickle=True),
+                           np.load(rfe_clc_data['ytrain_corr_r'], allow_pickle=True), 5)
+        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_r.joblib"))
 
 
 def PIPELINE_PART3_ML_ANALYSIS():
@@ -453,14 +554,30 @@ def main():
                          for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm'))
                            if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x))]
 
-    for rfe in rfes:
-        rfe_files = [x for x in morphBasedNormList if rfe in x]
-        rfe_corr_r_files = [x for x in rfe_files if '_corr_r_' in x]
-        rfe_corr_l_files = [x for x in rfe_files if '_corr_l_' in x]
-        
+    PIPELINE_PART3_ML(morphBasedNormList)
+    PIPELINE_PART3_ML(minMaxAxis1NormList)
+    PIPELINE_PART3_ML(minMaxNormRegList)
 
-    # clf_train_rf = train_models(Xtrain_norm, df_train['labels'].values, 5)
-    # dump(clf_left_rf, os.path.join(OUTPUT_DIR_ML, f"clf_left_OnlyCorr_.joblib"))
+    # data_dict = loadRFEFilesFrom(morphBasedNormList)
+    # for rfe_clc in data_dict:
+    #     print(rfe_clc)
+    #     rfe_clc_data = data_dict[rfe_clc]
+    #     rfe_clc = rfe_clc.split('.')[0]
+    #
+    #     clf = train_models(rfe_clc_data['Xtrain'],rfe_clc_data['ytrain'], 5)
+    #     dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train.joblib"))
+    #
+    #     clf = train_models(rfe_clc_data['Xtrain_corr'],rfe_clc_data['ytrain_corr'], 5)
+    #     dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr.joblib"))
+    #
+    #     clf = train_models(rfe_clc_data['Xtrain_corr_l'],rfe_clc_data['ytrain_corr_l'], 5)
+    #     dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_l.joblib"))
+    #
+    #     clf = train_models(rfe_clc_data['Xtrain_corr_r'],rfe_clc_data['ytrain_corr_r'], 5)
+    #     dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_r.joblib"))
+
+        # clf_train_rf = train_models(Xtrain_norm, df_train['labels'].values, 5)
+        # dump(clf_left_rf, os.path.join(OUTPUT_DIR_ML, f"clf_left_OnlyCorr_.joblib"))
 
 
 if __name__ == '__main__':
