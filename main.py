@@ -25,6 +25,7 @@ import os
 from ML_model_selection import train_models
 from constants import  DROPBOX_API_TOKEN
 
+
 def createDirIfNotExist_max2levels(dir):
     """
     Creates directory with maximum new depth 2 folders. String is supposed to be separated via /
@@ -371,19 +372,48 @@ def main():
     # Normalization
     # Trial 1
     Xtrain_norm, scdict_train = mynormalize(df_train.drop('labels', axis=1))
+    dump(scdict_train, os.path.join(OUTPUT_DIR_FS,'scdict_train_featBasedNorm.joblib'))
+
     Xtrain_corr_norm, scdict_traincorr = mynormalize(df_train_corr.drop('labels', axis=1))
+    dump(scdict_traincorr, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_featBasedNorm.joblib'))
+
     Xtrain_corr_l_norm, scdict_traincorr_l = mynormalize(df_train_corr_l.drop('labels', axis=1))
+    dump(scdict_traincorr_l, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_l_featBasedNorm.joblib'))
+
     Xtrain_corr_r_norm, scdict_traincorr_r = mynormalize(df_train_corr_r.drop('labels', axis=1))
+    dump(scdict_traincorr_r, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_r_featBasedNorm.joblib'))
+
     # Trial 2
     # Xtrain_norm, scdict_train = mynormalize(df_train.drop('labels', axis=1), allfeats=True)
+    # dump(scdict_train, os.path.join(OUTPUT_DIR_FS,'scdict_train_allfeatsNorm.joblib'))
+    #
     # Xtrain_corr_norm, scdict_traincorr = mynormalize(df_train_corr.drop('labels', axis=1), allfeats=True)
+    # dump(scdict_traincorr, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_allfeatsNorm.joblib'))
+    #
     # Xtrain_corr_l_norm, scdict_traincorr_l = mynormalize(df_train_corr_l.drop('labels', axis=1), allfeats=True)
+    # dump(scdict_traincorr_l, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_l_allfeatsNorm.joblib'))
+    #
     # Xtrain_corr_r_norm, scdict_traincorr_r = mynormalize(df_train_corr_r.drop('labels', axis=1), allfeats=True)
-    # Trial 2
-    # Xtrain_norm = MinMaxScaler().fit_transform(df_train.drop('labels', axis=1))
-    # Xtrain_corr_norm = MinMaxScaler().fit_transform(df_train_corr.drop('labels', axis=1))
-    # Xtrain_corr_l_norm = MinMaxScaler().fit_transform(df_train_corr_l.drop('labels', axis=1))
-    # Xtrain_corr_r_norm = MinMaxScaler().fit_transform(df_train_corr_r.drop('labels', axis=1))
+    # dump(scdict_traincorr_r, os.path.join(OUTPUT_DIR_FS,'scdict_traincorr_r_allfeatsNorm.joblib'))
+
+
+
+    # Trial 3
+    # sc = MinMaxScaler().fit(df_train.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_regminmax.joblib'))
+    # Xtrain_norm = sc.transform(df_train.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_regminmax.joblib'))
+    # Xtrain_corr_norm = sc.transform(df_train_corr.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr_l.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_l_regminmax.joblib'))
+    # Xtrain_corr_l_norm = sc.transform(df_train_corr_l.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr_r.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_r_regminmax.joblib'))
+    # Xtrain_corr_r_norm = sc.transform(df_train_corr_r.drop('labels', axis=1))
 
     ## 2. Perform Feature selection
     # Feature selection classifiers
@@ -545,18 +575,18 @@ def main():
     #                                       to make a list for them
     types = ['','corr','corr_r','corr_l']
 
-    morphBasedNormList = [os.path.join(OUTPUT_DIR_FS,x) for x in os.listdir(OUTPUT_DIR_FS)
-                          if os.path.isfile(os.path.join(OUTPUT_DIR_FS,x))]
-    minMaxAxis1NormList = [os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x)
-                           for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats'))
-                           if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x))]
-    minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x)
-                         for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm'))
-                           if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x))]
-
-    PIPELINE_PART3_ML(morphBasedNormList)
-    PIPELINE_PART3_ML(minMaxAxis1NormList)
-    PIPELINE_PART3_ML(minMaxNormRegList)
+    # morphBasedNormList = [os.path.join(OUTPUT_DIR_FS,x) for x in os.listdir(OUTPUT_DIR_FS)
+    #                       if os.path.isfile(os.path.join(OUTPUT_DIR_FS,x))]
+    # minMaxAxis1NormList = [os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x)
+    #                        for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats'))
+    #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x))]
+    # minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x)
+    #                      for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm'))
+    #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x))]
+    #
+    # PIPELINE_PART3_ML(morphBasedNormList)
+    # PIPELINE_PART3_ML(minMaxAxis1NormList)
+    # PIPELINE_PART3_ML(minMaxNormRegList)
 
     # data_dict = loadRFEFilesFrom(morphBasedNormList)
     # for rfe_clc in data_dict:
