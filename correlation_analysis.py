@@ -55,13 +55,18 @@ def default_criteria(df_hemi_correlated):
     return best_feat
 
 
-def remove_list_from_list(bigger_list, smaller_list):
+def remove_list_from_list(bigger_list, smaller_list_):
     """
     Remove all the elements in smaller_list from the bigger_list
     :param bigger_list: list
     :param smaller_list: list
     :return bigger_list: list
     """
+    smaller_list = []
+    for s in smaller_list_:
+        if s in bigger_list:
+            smaller_list.append(s)
+
     if len(bigger_list) < len(smaller_list):
         raise ValueError("The first argument should be the bigger list")
 

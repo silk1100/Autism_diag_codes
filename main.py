@@ -275,14 +275,29 @@ def PIPELINE_PART2_FS_rf(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l_
     rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
     _PIPELINE_PART2_FS(rf, Xtrain_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '', 'rf')
 
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    _PIPELINE_PART2_FS(rf, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'rf')
+    if Xtrain_corr_norm_site.shape[1] > 25:
+        rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+        _PIPELINE_PART2_FS(rf, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'rf')
+    else:
+        dump(Xtrain_corr_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_rf_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_rf.npy'), Xtrain_corr_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    _PIPELINE_PART2_FS(rf, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'rf')
+    if Xtrain_corr_l_norm_site.shape[1] > 25:
+        rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+        _PIPELINE_PART2_FS(rf, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'rf')
+    else:
+        dump(Xtrain_corr_l_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_l_rf_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_l_rf.npy'), Xtrain_corr_l_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    _PIPELINE_PART2_FS(rf, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'rf')
+    if Xtrain_corr_r_norm_site.shape[1] > 25:
+        rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+        _PIPELINE_PART2_FS(rf, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'rf')
+    else:
+        dump(Xtrain_corr_r_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_r_rf_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_l_rf.npy'), Xtrain_corr_r_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
 
 def PIPELINE_PART2_FS_svm(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l_norm_site, Xtrain_corr_r_norm_site,
@@ -291,14 +306,29 @@ def PIPELINE_PART2_FS_svm(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l
     svm = LinearSVC(max_iter=MAX_ITR)
     _PIPELINE_PART2_FS(svm, Xtrain_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '', 'svm')
 
-    svm = LinearSVC(max_iter=MAX_ITR)
-    _PIPELINE_PART2_FS(svm, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'svm')
+    if Xtrain_corr_norm_site.shape[1] > 25:
+        svm = LinearSVC(max_iter=MAX_ITR)
+        _PIPELINE_PART2_FS(svm, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'svm')
+    else:
+        dump(Xtrain_corr_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_svm_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_svm.npy'), Xtrain_corr_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    svm = LinearSVC(max_iter=MAX_ITR)
-    _PIPELINE_PART2_FS(svm, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'svm')
+    if Xtrain_corr_l_norm_site.shape[1] > 25:
+        svm = LinearSVC(max_iter=MAX_ITR)
+        _PIPELINE_PART2_FS(svm, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'svm')
+    else:
+        dump(Xtrain_corr_l_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_l_svm_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_l_svm.npy'), Xtrain_corr_l_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    svm = LinearSVC(max_iter=MAX_ITR)
-    _PIPELINE_PART2_FS(svm, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'svm')
+    if Xtrain_corr_r_norm_site.shape[1] > 25:
+        svm = LinearSVC(max_iter=MAX_ITR)
+        _PIPELINE_PART2_FS(svm, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'svm')
+    else:
+        dump(Xtrain_corr_r_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_r_svm_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_r_svm.npy'), Xtrain_corr_r_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
 
 def PIPELINE_PART2_FS_lg2(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l_norm_site, Xtrain_corr_r_norm_site,
@@ -307,14 +337,29 @@ def PIPELINE_PART2_FS_lg2(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l
     lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
     _PIPELINE_PART2_FS(lg2, Xtrain_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '', 'lg2')
 
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg2, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'lg2')
+    if Xtrain_corr_norm_site.shape[1] > 25:
+        lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg2, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'lg2')
+    else:
+        dump(Xtrain_corr_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_lg2_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_lg2.npy'), Xtrain_corr_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg2, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'lg2')
+    if Xtrain_corr_l_norm_site.shape[1] > 25:
+        lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg2, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'lg2')
+    else:
+        dump(Xtrain_corr_l_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_l_lg2_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_l_lg2.npy'), Xtrain_corr_l_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg2, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'lg2')
+    if Xtrain_corr_r_norm_site.shape[1] > 25:
+        lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg2, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'lg2')
+    else:
+        dump(Xtrain_corr_r_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_r_lg2_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_r_lg2.npy'), Xtrain_corr_r_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
 
 def PIPELINE_PART2_FS_lg1(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l_norm_site, Xtrain_corr_r_norm_site,
@@ -323,14 +368,29 @@ def PIPELINE_PART2_FS_lg1(Xtrain_norm_site, Xtrain_corr_norm_site, Xtrain_corr_l
     lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
     _PIPELINE_PART2_FS(lg1, Xtrain_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '', 'lg1')
 
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg1, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'lg1')
+    if Xtrain_corr_norm_site.shape[1] > 25:
+        lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg1, Xtrain_corr_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr', 'lg1')
+    else:
+        dump(Xtrain_corr_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_lg1_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_lg1.npy'), Xtrain_corr_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg1, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'lg1')
+    if Xtrain_corr_l_norm_site.shape[1] > 25:
+        lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg1, Xtrain_corr_l_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_l', 'lg1')
+    else:
+        dump(Xtrain_corr_l_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_l_lg1_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_l_lg1.npy'), Xtrain_corr_l_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
-    _PIPELINE_PART2_FS(lg1, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'lg1')
+    if Xtrain_corr_r_norm_site.shape[1] > 25:
+        lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
+        _PIPELINE_PART2_FS(lg1, Xtrain_corr_r_norm_site, ytrain_site, 'balanced_accuracy', site, normtype, '_corr_r', 'lg1')
+    else:
+        dump(Xtrain_corr_r_norm_site, os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/rfetrain_corr_r_lg1_noneed.joblib'))
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/Xtrain_corr_r_lg1.npy'), Xtrain_corr_r_norm_site)
+        np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain_site)
 
 
 def _PIPELINE_PART2_FS(clc, Xtrain, ytrain, scoring_metric, site, normtype, datype, clc_name):
@@ -348,7 +408,7 @@ def _PIPELINE_PART2_FS(clc, Xtrain, ytrain, scoring_metric, site, normtype, daty
     np.save(os.path.join(OUTPUT_DIR_FS, site, f'{normtype}/ytrain.npy'), ytrain)
 
 
-def PIPELINE_PART3_ML(morphBasedNormList):
+def PIPELINE_PART3_ML(morphBasedNormList, site):
     data_dict = loadRFEFilesFrom(morphBasedNormList)
     for rfe_clc in data_dict:
         print(rfe_clc)
@@ -357,19 +417,19 @@ def PIPELINE_PART3_ML(morphBasedNormList):
 
         clf = train_models(np.load(rfe_clc_data['Xtrain'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain'], allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train.joblib"))
+        dump(clf, os.path.join(OUTPUT_DIR_ML,site, f"clf_{rfe_clc}_train.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr'],allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr'],allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr.joblib"))
+        dump(clf, os.path.join(OUTPUT_DIR_ML,site, f"clf_{rfe_clc}_train_corr.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr_l'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr_l'],allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_l.joblib"))
+        dump(clf, os.path.join(OUTPUT_DIR_ML,site, f"clf_{rfe_clc}_train_corr_l.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr_r'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr_r'], allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_r.joblib"))
+        dump(clf, os.path.join(OUTPUT_DIR_ML,site, f"clf_{rfe_clc}_train_corr_r.joblib"))
 
 
 def PIPELINE_PART3_ML_ANALYSIS():
@@ -531,13 +591,13 @@ def main():
     # minMaxAxis1NormList = [os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x)
     #                        for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats'))
     #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x))]
-    # minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x)
-    #                      for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm'))
-    #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x))]
+    minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS, site, 'minmaxreg',x)
+                         for x in os.listdir(os.path.join(OUTPUT_DIR_FS, site, 'minmaxreg'))
+                           if os.path.isfile(os.path.join(OUTPUT_DIR_FS, site, 'minmaxreg',x))]
     #
     # PIPELINE_PART3_ML(morphBasedNormList)
     # PIPELINE_PART3_ML(minMaxAxis1NormList)
-    # PIPELINE_PART3_ML(minMaxNormRegList)
+    PIPELINE_PART3_ML(minMaxNormRegList, site)
 
     # data_dict = loadRFEFilesFrom(morphBasedNormList)
     # for rfe_clc in data_dict:
