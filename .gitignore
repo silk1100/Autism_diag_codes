@@ -10,3 +10,7 @@ catboost_info/
 *.zip
 Results/
 Results_NOCORRANA/
+Final_Results_sites_bad/
+Final_Results_sites/ML/
+Final_Results_sites/FS/
+
