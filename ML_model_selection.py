@@ -4,7 +4,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from xgboost import  XGBClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSearchCV, RepeatedStratifiedKFold
 from sklearn.metrics import f1_score, balanced_accuracy_score, make_scorer
 from constants import MAX_ITR, PARAM_GRID
 
@@ -13,11 +13,11 @@ CLC_DIST={
     'lSVM': LinearSVC(max_iter=MAX_ITR),
     'pagg': PassiveAggressiveClassifier(n_jobs=-1),
     'lg': LogisticRegression(max_iter=MAX_ITR, n_jobs=-1),
-    'XGB':XGBClassifier(validate_parameters=True, n_jobs=-1),
+    # 'XGB':XGBClassifier(validate_parameters=True, n_jobs=-1),
     'GNB': GaussianNB(),
     'Rf': RandomForestClassifier(n_jobs=-1),
     'SVC':SVC(max_iter=MAX_ITR),
-    'nn':MLPClassifier(max_iter=MAX_ITR)
+    # 'nn':MLPClassifier(max_iter=MAX_ITR)
 }
 
 

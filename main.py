@@ -313,10 +313,14 @@ def main():
     # For every site:
     #   If number of ASD subjects/number of td subjects>0.6 (or other wise), then drop the site
     # Include only sites with balanced sites
-    data_dir = "D:\\PhD\\Data\\aparc\\DrEid_brain_sMRI_lr_TDASD.csv"
+    data_dir = "D:/PhD/Data/aparc/DrEid_brain_sMRI_lr_TDASD.csv"
     dfs, series = PIPELINE_PART1_DATA_PREPROCESSING(data_dir)
     df, df_l, df_r = dfs
     age, sex, labels = series
+
+    df = pd.concat([df, labels], axis=1)
+    df_l = pd.concat([df_l, labels], axis=1)
+    df_r = pd.concat([df_r, labels], axis=1)
 
     # Calculate the difference between left and right hemisphere (using numpy not pandas)
     # print(np.sum(df_l.values-df_r.values)) # = 286.372303 (not zero as pandas produce)
@@ -343,13 +347,13 @@ def main():
     corr_thresh = 50
 
     # 1a. Correlation analysis over the whole brain
-    dftrain_corr = PIPELINE_PART1_CORR_ANALYSIS(df, df['labels'], corr_thresh,
+    dftrain_corr = PIPELINE_PART1_CORR_ANALYSIS(df.drop('labels', axis=1), df['labels'], corr_thresh,
                                                 file_name='fullbrain_corr.csv', write_on_disk=True)
     # 1b. Correlation analysis over the left hemisphere
-    dftrain_l_corr = PIPELINE_PART1_CORR_ANALYSIS(df_l, df_l['labels'], corr_thresh,
+    dftrain_l_corr = PIPELINE_PART1_CORR_ANALYSIS(df_l.drop('labels', axis=1), df_l['labels'], corr_thresh,
                                                 file_name='leftbrain_corr.csv', write_on_disk=True)
     # 1c. Correlation analysis over the right hemisphere
-    dftrain_r_corr = PIPELINE_PART1_CORR_ANALYSIS(df_r, df_r['labels'], corr_thresh,
+    dftrain_r_corr = PIPELINE_PART1_CORR_ANALYSIS(df_r.drop('labels', axis=1), df_r['labels'], corr_thresh,
                                                 file_name='rightbrain_corr.csv', write_on_disk=True)
 
     ## Feature selection for (1a, 1b, 1c, full data)
@@ -425,27 +429,27 @@ def main():
                                                      df_train['labels'].values,
                                                      scoring_metric='balanced_accuracy',
                                                      save_file=False)
-    dump(rfetrain_rf,os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_rf.npy'), Xtrain_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain.npy'), ytrain)
+    dump(rfetrain_rf,os.path.join(OUTPUT_DIR_FS, 'rfetrain_rf.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_rf.npy'), Xtrain_rf)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain.npy'), ytrain)
 
     rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
     Xtrain_corr_rf, ytrain_corr, rfetrain_corr_rf = select_features(rf,Xtrain_corr_norm,
                                                      df_train_corr['labels'].values,
                                                      scoring_metric='balanced_accuracy',
                                                      save_file=False)
-    dump(rfetrain_corr_rf,os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_rf.npy'), Xtrain_corr_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr.npy'), ytrain_corr)
+    dump(rfetrain_corr_rf,os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_rf.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_rf.npy'), Xtrain_corr_rf)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr.npy'), ytrain_corr)
 
     rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
     Xtrain_corr_l_rf, ytrain_corr_l, rfetrain_corr_l_rf = select_features(rf,Xtrain_corr_l_norm,
                                                      df_train_corr_l['labels'].values,
                                                      scoring_metric='balanced_accuracy',
                                                      save_file=False)
-    dump(rfetrain_corr_l_rf,os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_l_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_l_rf.npy'), Xtrain_corr_l_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr_l.npy'), ytrain_corr_l)
+    dump(rfetrain_corr_l_rf,os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_l_rf.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_l_rf.npy'), Xtrain_corr_l_rf)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr_l.npy'), ytrain_corr_l)
 
 
     rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
@@ -453,9 +457,9 @@ def main():
                                                      df_train_corr_r['labels'].values,
                                                      scoring_metric='balanced_accuracy',
                                                      save_file=False)
-    dump(rfetrain_corr_r_rf,os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_r_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_r_rf.npy'), Xtrain_corr_r_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr_r.npy'), ytrain_corr_r)
+    dump(rfetrain_corr_r_rf,os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_r_rf.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_r_rf.npy'), Xtrain_corr_r_rf)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr_r.npy'), ytrain_corr_r)
 
 
     svm = LinearSVC(max_iter=MAX_ITR)
@@ -463,36 +467,36 @@ def main():
                                                      df_train['labels'].values,
                                                      scoring_metric='balanced_accuracy',
                                                      save_file=False)
-    dump(rfetrain_svm, os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_svm.npy'), Xtrain_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain.npy'), ytrain)
+    dump(rfetrain_svm, os.path.join(OUTPUT_DIR_FS, 'rfetrain_svm.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_svm.npy'), Xtrain_svm)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain.npy'), ytrain)
 
     svm = LinearSVC(max_iter=MAX_ITR)
     Xtrain_corr_svm, ytrain_corr, rfetrain_corr_svm = select_features(svm, Xtrain_corr_norm,
                                                                     df_train_corr['labels'].values,
                                                                     scoring_metric='balanced_accuracy',
                                                                     save_file=False)
-    dump(rfetrain_corr_svm, os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_svm.npy'), Xtrain_corr_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr.npy'), ytrain_corr)
+    dump(rfetrain_corr_svm, os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_svm.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_svm.npy'), Xtrain_corr_svm)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr.npy'), ytrain_corr)
 
     svm = LinearSVC(max_iter=MAX_ITR)
     Xtrain_corr_l_svm, ytrain_corr_l, rfetrain_corr_l_svm = select_features(svm, Xtrain_corr_l_norm,
                                                                           df_train_corr_l['labels'].values,
                                                                           scoring_metric='balanced_accuracy',
                                                                           save_file=False)
-    dump(rfetrain_corr_l_svm, os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_l_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_l_svm.npy'), Xtrain_corr_l_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr_l.npy'), ytrain_corr_l)
+    dump(rfetrain_corr_l_svm, os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_l_svm.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_l_svm.npy'), Xtrain_corr_l_svm)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr_l.npy'), ytrain_corr_l)
 
     svm = LinearSVC(max_iter=MAX_ITR)
     Xtrain_corr_r_svm, ytrain_corr_r, rfetrain_corr_r_svm = select_features(svm, Xtrain_corr_r_norm,
                                                                           df_train_corr_r['labels'].values,
                                                                           scoring_metric='balanced_accuracy',
                                                                           save_file=False)
-    dump(rfetrain_corr_r_svm, os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/rfetrain_corr_r_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/Xtrain_corr_r_svm.npy'), Xtrain_corr_r_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, 'Normalize_allMorphFeats/ytrain_corr_r.npy'), ytrain_corr_r)
+    dump(rfetrain_corr_r_svm, os.path.join(OUTPUT_DIR_FS, 'rfetrain_corr_r_svm.joblib'))
+    np.save(os.path.join(OUTPUT_DIR_FS, 'Xtrain_corr_r_svm.npy'), Xtrain_corr_r_svm)
+    np.save(os.path.join(OUTPUT_DIR_FS, 'ytrain_corr_r.npy'), ytrain_corr_r)
 
     # Lg All data
     lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR,solver='saga')
