@@ -105,7 +105,7 @@ class MyMinMax:
 
 
 def loadRFEFilesFrom(morphBasedNormList):
-    rfes = ['lg1','lg2','svm','_rf.']
+    rfes = ['lg1','lg2','svm','_rf']
     data_dict = {}
     for rfe in rfes:
         ytrain_corr = [x for x in morphBasedNormList if ('ytrain_corr' in x)
@@ -409,8 +409,19 @@ def _PIPELINE_PART2_FS(clc, Xtrain, ytrain, scoring_metric, site, normtype, daty
         np.save(os.path.join(OUTPUT_DIR_FS, site, normtype, f'ytrain{datype}.npy'), ytrain)
 
 
-def PIPELINE_PART3_ML(morphBasedNormList):
+def PIPELINE_PART3_ML(morphBasedNormList, site, normtype):
+
     data_dict = loadRFEFilesFrom(morphBasedNormList)
+    if not os.path.isdir(os.path.join(OUTPUT_DIR_ML, site)):
+        os.mkdir(os.path.join(OUTPUT_DIR_ML, site))
+
+    if len(normtype)>0:
+        if not os.path.isdir(os.path.join(OUTPUT_DIR_ML, site, normtype)):
+            os.mkdir(os.path.join(OUTPUT_DIR_ML, site, normtype))
+        full_dir = os.path.join(OUTPUT_DIR_ML, site, normtype)
+    else:
+        full_dir = os.path.join(OUTPUT_DIR_ML, site)
+
     for rfe_clc in data_dict:
         print(rfe_clc)
         rfe_clc_data = data_dict[rfe_clc]
@@ -418,19 +429,19 @@ def PIPELINE_PART3_ML(morphBasedNormList):
 
         clf = train_models(np.load(rfe_clc_data['Xtrain'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain'], allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train.joblib"))
+        dump(clf, os.path.join(full_dir, f"clf_{rfe_clc}_train.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr'],allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr'],allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr.joblib"))
+        dump(clf, os.path.join(full_dir, f"clf_{rfe_clc}_train_corr.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr_l'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr_l'],allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_l.joblib"))
+        dump(clf, os.path.join(full_dir, f"clf_{rfe_clc}_train_corr_l.joblib"))
 
         clf = train_models(np.load(rfe_clc_data['Xtrain_corr_r'], allow_pickle=True),
                            np.load(rfe_clc_data['ytrain_corr_r'], allow_pickle=True), 5)
-        dump(clf, os.path.join(OUTPUT_DIR_ML, f"clf_{rfe_clc}_train_corr_r.joblib"))
+        dump(clf, os.path.join(full_dir, f"clf_{rfe_clc}_train_corr_r.joblib"))
 
 
 def PIPELINE_PART3_ML_ANALYSIS():
@@ -450,8 +461,8 @@ def main():
     #   If number of ASD subjects/number of td subjects>0.6 (or other wise), then drop the site
     # Include only sites with balanced sites
     # data_dir = "D:\\PhD\\Data\\aparc\\DrEid_brain_sMRI_lr_TDASD.csv"
-    data_files = ['D:/PhD/Data/aparc/Morph_Split/curv.csv', 'D:/PhD/Data/aparc/Morph_Split/area.csv',
-                  'D:/PhD/Data/aparc/Morph_Split/volume.csv', 'D:/PhD/Data/aparc/Morph_Split/thickness.csv']
+    # data_files = ['D:/PhD/Data/aparc/Morph_Split/curv.csv', 'D:/PhD/Data/aparc/Morph_Split/area.csv',
+    data_files = ['D:/PhD/Data/aparc/Morph_Split/volume.csv', 'D:/PhD/Data/aparc/Morph_Split/thickness.csv']
     morph_fldrs_dict = {}
     for data_dir in data_files:
         fldr_name = data_dir.split('/')[-1].split('.')[0]
@@ -477,25 +488,41 @@ def main():
         """
 
         # Separate a testset before the pipline begins
-        from sklearn.model_selection import train_test_split
-        dftrain, dftest, labelstrain, labelstest = train_test_split(df, labels, test_size=0.1, random_state=42)
-        dftrain_l, dftrain_r = split_l_r(dftrain)
-        dftest_l, dftest_r = split_l_r(dftest)
+        if not os.path.isfile(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],f'train_fullbrain_{morph_fldrs_dict[data_dir]}.csv')):
+            from sklearn.model_selection import train_test_split
+            dftrain, dftest, labelstrain, labelstest = train_test_split(df, labels, test_size=0.1, random_state=42)
+            dftrain_l, dftrain_r = split_l_r(dftrain)
+            dftest_l, dftest_r = split_l_r(dftest)
 
-        pd.concat([dftrain, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
-                                                                      f'train_fullbrain_{morph_fldrs_dict[data_dir]}.csv'))
-        pd.concat([dftrain_l, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, morph_fldrs_dict[data_dir],
-                                                                      f'train_leftbrain_{morph_fldrs_dict[data_dir]}.csv'))
-        pd.concat([dftrain_r, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, morph_fldrs_dict[data_dir],
-                                                                      f'train_rightbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftrain, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
+                                                                          f'train_fullbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftrain_l, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, morph_fldrs_dict[data_dir],
+                                                                          f'train_leftbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftrain_r, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, morph_fldrs_dict[data_dir],
+                                                                          f'train_rightbrain_{morph_fldrs_dict[data_dir]}.csv'))
 
-        pd.concat([dftest, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
-                                                                    f'test_fullbrain_{morph_fldrs_dict[data_dir]}.csv'))
-        pd.concat([dftest_l, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
-                                                                    f'test_leftbrain_{morph_fldrs_dict[data_dir]}.csv'))
-        pd.concat([dftest_r, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
-                                                                    f'test_rightbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftest, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
+                                                                        f'test_fullbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftest_l, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
+                                                                        f'test_leftbrain_{morph_fldrs_dict[data_dir]}.csv'))
+            pd.concat([dftest_r, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT,morph_fldrs_dict[data_dir],
+                                                                        f'test_rightbrain_{morph_fldrs_dict[data_dir]}.csv'))
 
+        else:
+            df_train = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT,
+                                               morph_fldrs_dict[data_dir],
+                                               f'train_fullbrain_{morph_fldrs_dict[data_dir]}.csv'), index_col=0)
+            dftrain, labelstrain = df_train.drop('labels', axis=1), df_train['labels']
+
+            df_train_l = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT,
+                                               morph_fldrs_dict[data_dir],
+                                               f'train_leftbrain_{morph_fldrs_dict[data_dir]}.csv'), index_col=0)
+            dftrain_l, labelstrain = df_train_l.drop('labels', axis=1), df_train_l['labels']
+
+            df_train_r = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT,
+                                               morph_fldrs_dict[data_dir],
+                                               f'train_rightbrain_{morph_fldrs_dict[data_dir]}.csv'), index_col=0)
+            dftrain_r, labelstrain = df_train_r.drop('labels', axis=1), df_train_r['labels']
 
         ### Pipeline Begins
         ## 1. Perform correlation analysis
@@ -566,27 +593,31 @@ def main():
 
 
         # Trial 3
-        sc = MinMaxScaler().fit(df_train.drop('labels', axis=1))
-        dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
-        Xtrain_norm = sc.transform(df_train.drop('labels', axis=1))
+        # sc = MinMaxScaler().fit(df_train.drop('labels', axis=1))
+        # dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
+        # Xtrain_norm = sc.transform(df_train.drop('labels', axis=1))
+        #
+        # sc = MinMaxScaler().fit(df_train_corr.drop('labels', axis=1))
+        # dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
+        # Xtrain_corr_norm = sc.transform(df_train_corr.drop('labels', axis=1))
+        #
+        # sc = MinMaxScaler().fit(df_train_corr_l.drop('labels', axis=1))
+        # dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_l_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
+        # Xtrain_corr_l_norm = sc.transform(df_train_corr_l.drop('labels', axis=1))
+        #
+        # sc = MinMaxScaler().fit(df_train_corr_r.drop('labels', axis=1))
+        # dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_r_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
+        # Xtrain_corr_r_norm = sc.transform(df_train_corr_r.drop('labels', axis=1))
 
-        sc = MinMaxScaler().fit(df_train_corr.drop('labels', axis=1))
-        dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
-        Xtrain_corr_norm = sc.transform(df_train_corr.drop('labels', axis=1))
-
-        sc = MinMaxScaler().fit(df_train_corr_l.drop('labels', axis=1))
-        dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_l_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
-        Xtrain_corr_l_norm = sc.transform(df_train_corr_l.drop('labels', axis=1))
-
-        sc = MinMaxScaler().fit(df_train_corr_r.drop('labels', axis=1))
-        dump(sc, os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],f'sc_train_corr_r_regminmax_{morph_fldrs_dict[data_dir]}.joblib'))
-        Xtrain_corr_r_norm = sc.transform(df_train_corr_r.drop('labels', axis=1))
-
+        Xtrain_norm = df_train.drop('labels', axis=1).values
+        Xtrain_corr_norm = df_train_corr.drop('labels', axis=1).values
+        Xtrain_corr_l_norm = df_train_corr_l.drop('labels', axis=1).values
+        Xtrain_corr_r_norm = df_train_corr_r.drop('labels', axis=1).values
         ytrain = df_train['labels'].values
         ## 2. Perform Feature selection
         # Feature selection classifiers
         MAX_ITR=1000000
-        normtype='minmaxreg'
+        normtype='NoNorm'
 
         PIPELINE_PART2_FS_rf(Xtrain_norm, Xtrain_corr_norm, Xtrain_corr_l_norm, Xtrain_corr_r_norm,
                              ytrain, morph_fldrs_dict[data_dir], normtype)
@@ -611,13 +642,13 @@ def main():
         # minMaxAxis1NormList = [os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x)
         #                        for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats'))
         #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Normalize_allMorphFeats',x))]
-        # minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x)
-        #                      for x in os.listdir(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm'))
-        #                        if os.path.isfile(os.path.join(OUTPUT_DIR_FS,'Regular_minMaxNorm',x))]
+        minMaxNormRegList = [os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],normtype,x)
+                             for x in os.listdir(os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],normtype))
+                               if os.path.isfile(os.path.join(OUTPUT_DIR_FS,morph_fldrs_dict[data_dir],normtype,x))]
         #
         # PIPELINE_PART3_ML(morphBasedNormList)
         # PIPELINE_PART3_ML(minMaxAxis1NormList)
-        # PIPELINE_PART3_ML(minMaxNormRegList)
+        PIPELINE_PART3_ML(minMaxNormRegList, morph_fldrs_dict[data_dir], normtype)
 
         # data_dict = loadRFEFilesFrom(morphBasedNormList)
         # for rfe_clc in data_dict:

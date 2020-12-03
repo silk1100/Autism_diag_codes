@@ -13,11 +13,11 @@ CLC_DIST={
     'lSVM': LinearSVC(max_iter=MAX_ITR),
     'pagg': PassiveAggressiveClassifier(n_jobs=-1),
     'lg': LogisticRegression(max_iter=MAX_ITR, n_jobs=-1),
-    'XGB':XGBClassifier(validate_parameters=True, n_jobs=-1),
+    # 'XGB':XGBClassifier(validate_parameters=True, n_jobs=-1),
     'GNB': GaussianNB(),
     'Rf': RandomForestClassifier(n_jobs=-1),
     'SVC':SVC(max_iter=MAX_ITR),
-    'nn':MLPClassifier(max_iter=MAX_ITR)
+    # 'nn':MLPClassifier(max_iter=MAX_ITR)
 }
 
 
