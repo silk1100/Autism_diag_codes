@@ -64,11 +64,11 @@ PARAM_GRID={
         'beta_2':[0, 0.001, 0.01, 0.1, 0.3, 0.5, 0.9],
     }
 }
-OUTPUT_DIR_ML = './Final_Results/ML'
-OUTPUT_DIR_FS = './Final_Results/FS'
-OUTPUT_DIR_CORR = './Final_Results/CORR_ANA'
-OUTPUT_DIR_SPLIT = './Final_Results/INITIAL_SPLIT'
-OUTPUT_DIR_site_ana = './Final_Results/site_analysis'
+OUTPUT_DIR_ML = './Final_Results_adjusted/ML'
+OUTPUT_DIR_FS = './Final_Results_adjusted/FS'
+OUTPUT_DIR_CORR = './Final_Results_adjusted/CORR_ANA'
+OUTPUT_DIR_SPLIT = './Final_Results_adjusted/INITIAL_SPLIT'
+OUTPUT_DIR_site_ana = './Final_Results_adjusted/site_analysis'
 
 #
 # OUTPUT_DIR_ML = './Results/ML'
