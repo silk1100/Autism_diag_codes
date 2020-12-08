@@ -222,7 +222,7 @@ def mynormalize(df, allfeats=False):
     return XN, scalersdict
 
 
-def PIPELINE_PART1_DATA_PREPROCESSING(data_dir, write_on_disk=True):
+def PIPELINE_PART1_DATA_PREPROCESSING(data_dir, write_on_disk=True, adj_data=False):
     """
     data_dir is supposed to be the directory of the correct data representation (median-iqr, median+iqr) of
     the full dataset. The output will be a tuple of size 2: tuple[0]: 3 dataframes (full brain of subjects
@@ -244,6 +244,18 @@ def PIPELINE_PART1_DATA_PREPROCESSING(data_dir, write_on_disk=True):
     age = df.pop('age')
     sex = df.pop('sex')
     labels = df.pop('labels')
+
+    if adj_data:
+        area_cols = [x for x in df.columns if 'area' in x]
+        vol_cols = [x for x in df.columns if 'volume' in x]
+        conv_area_cols = [x for x in area_cols if 'adj' not in x]
+        conv_vol_cols = [x for x in vol_cols if 'adj' not in x]
+        adj_area_cols = [x for x in area_cols if 'adj' in x]
+        adj_vol_cols = [x for x in vol_cols if 'adj' in x]
+        df.drop(conv_area_cols, axis=1, inplace=True)
+        df.drop(conv_vol_cols, axis=1, inplace=True)
+        df.rename(columns={x:'_'.join(x.split('_')[1:]) for x in adj_vol_cols}, inplace=True)
+        df.rename(columns={x: '_'.join(x.split('_')[1:]) for x in adj_area_cols}, inplace=True)
 
     # Split data into left and right hemisphere
     df_l, df_r = split_l_r(df)
@@ -314,7 +326,7 @@ def main():
     #   If number of ASD subjects/number of td subjects>0.6 (or other wise), then drop the site
     # Include only sites with balanced sites
     data_dir = "./adjusted_data.csv"
-    dfs, series = PIPELINE_PART1_DATA_PREPROCESSING(data_dir)
+    dfs, series = PIPELINE_PART1_DATA_PREPROCESSING(data_dir,adj_data=True)
     df, df_l, df_r = dfs
     age, sex, labels = series
 
