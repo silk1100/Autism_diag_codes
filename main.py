@@ -325,12 +325,12 @@ def main():
     # For every site:
     #   If number of ASD subjects/number of td subjects>0.6 (or other wise), then drop the site
     # Include only sites with balanced sites
-    data_dir = "./adjusted_data.csv"
-    dfs, series = PIPELINE_PART1_DATA_PREPROCESSING(data_dir,adj_data=True)
-    df, df_l, df_r = dfs
-    age, sex, labels = series
-
-    # Calculate the difference between left and right hemisphere (using numpy not pandas)
+    # data_dir = "./adjusted_data.csv"
+    # dfs, series = PIPELINE_PART1_DATA_PREPROCESSING(data_dir, adj_data=True)
+    # df, df_l, df_r = dfs
+    # age, sex, labels = series
+    #
+    # # Calculate the difference between left and right hemisphere (using numpy not pandas)
     # print(np.sum(df_l.values-df_r.values)) # = 286.372303 (not zero as pandas produce)
     # for indx, col in enumerate(df_l.columns):
     #     print(f'Correlation coef of {col} = {np.corrcoef(df_r.iloc[:, indx].values, df_l.iloc[:, indx].values)}')
@@ -342,32 +342,40 @@ def main():
     """
 
     # Separate a testset before the pipline begins
-    from sklearn.model_selection import train_test_split
-    dftrain, dftest, labelstrain, labelstest = train_test_split(df, labels, test_size=0.1, random_state=42)
-    dftrain_l, dftrain_r = split_l_r(dftrain)
-    dftest_l, dftest_r = split_l_r(dftest)
-
-    pd.concat([dftrain, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_fullbrain.csv'))
-    pd.concat([dftrain_l, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_leftbrain.csv'))
-    pd.concat([dftrain_r, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_rightbrain.csv'))
-
-    pd.concat([dftest, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_fullbrain.csv'))
-    pd.concat([dftest_l, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_leftbrain.csv'))
-    pd.concat([dftest_r, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_rightbrain.csv'))
-
-    ### Pipeline Begins
-    ## 1. Perform correlation analysis
-    corr_thresh = 50
-
-    # 1a. Correlation analysis over the whole brain
-    dftrain_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain, labelstrain, corr_thresh,
-                                                file_name='fullbrain_corr.csv', write_on_disk=True)
-    # 1b. Correlation analysis over the left hemisphere
-    dftrain_l_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain_l, labelstrain, corr_thresh,
-                                                file_name='leftbrain_corr.csv', write_on_disk=True)
-    # 1c. Correlation analysis over the right hemisphere
-    dftrain_r_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain_r, labelstrain, corr_thresh,
-                                                file_name='rightbrain_corr.csv', write_on_disk=True)
+    # from sklearn.model_selection import train_test_split
+    # dftrain, dftest, labelstrain, labelstest = train_test_split(df, labels, test_size=0.1, random_state=42)
+    # dftrain_l, dftrain_r = split_l_r(dftrain)
+    # dftest_l, dftest_r = split_l_r(dftest)
+    #
+    # pd.concat([dftrain, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_fullbrain.csv'))
+    # pd.concat([dftrain_l, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_leftbrain.csv'))
+    # pd.concat([dftrain_r, labelstrain], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_rightbrain.csv'))
+    #
+    # pd.concat([dftest, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_fullbrain.csv'))
+    # pd.concat([dftest_l, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_leftbrain.csv'))
+    # pd.concat([dftest_r, labelstest], axis=1).to_csv(os.path.join(OUTPUT_DIR_SPLIT, 'test_rightbrain.csv'))
+    # # df_train = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_fullbrain.csv'), index_col=0)
+    # # df_train_l = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_leftbrain.csv'), index_col=0)
+    # # df_train_r = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT, 'train_rightbrain.csv'), index_col=0)
+    # # dftrain, labelstrain = df_train.drop('labels', axis=1), df_train['labels']
+    # # dftrain_l, labelstrain = df_train_l.drop('labels', axis=1), df_train_l['labels']
+    # # dftrain_r, labelstrain = df_train_r.drop('labels', axis=1), df_train_r['labels']
+    #
+    # x=0
+    #
+    # ### Pipeline Begins
+    # ## 1. Perform correlation analysis
+    # corr_thresh = 50
+    #
+    # # 1a. Correlation analysis over the whole brain
+    # dftrain_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain, labelstrain, corr_thresh,
+    #                                             file_name='fullbrain_corr.csv', write_on_disk=True)
+    # # 1b. Correlation analysis over the left hemisphere
+    # dftrain_l_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain_l, labelstrain, corr_thresh,
+    #                                             file_name='leftbrain_corr.csv', write_on_disk=True)
+    # # 1c. Correlation analysis over the right hemisphere
+    # dftrain_r_corr = PIPELINE_PART1_CORR_ANALYSIS(dftrain_r, labelstrain, corr_thresh,
+    #                                             file_name='rightbrain_corr.csv', write_on_disk=True)
 
     # ## Feature selection for (1a, 1b, 1c, full data)
     df_train = pd.read_csv(os.path.join(OUTPUT_DIR_SPLIT,'train_fullbrain.csv'), index_col=0)
@@ -418,177 +426,177 @@ def main():
 
 
     # Trial 3
-    sc = MinMaxScaler().fit(df_train.drop('labels', axis=1))
-    dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_regminmax.joblib'))
-    Xtrain_norm = sc.transform(df_train.drop('labels', axis=1))
-
-    sc = MinMaxScaler().fit(df_train_corr.drop('labels', axis=1))
-    dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_regminmax.joblib'))
-    Xtrain_corr_norm = sc.transform(df_train_corr.drop('labels', axis=1))
-
-    sc = MinMaxScaler().fit(df_train_corr_l.drop('labels', axis=1))
-    dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_l_regminmax.joblib'))
-    Xtrain_corr_l_norm = sc.transform(df_train_corr_l.drop('labels', axis=1))
-
-    sc = MinMaxScaler().fit(df_train_corr_r.drop('labels', axis=1))
-    dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_r_regminmax.joblib'))
-    Xtrain_corr_r_norm = sc.transform(df_train_corr_r.drop('labels', axis=1))
-
-    ## 2. Perform Feature selection
-    # Feature selection classifiers
+    # sc = MinMaxScaler().fit(df_train.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_regminmax.joblib'))
+    # Xtrain_norm = sc.transform(df_train.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_regminmax.joblib'))
+    # Xtrain_corr_norm = sc.transform(df_train_corr.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr_l.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_l_regminmax.joblib'))
+    # Xtrain_corr_l_norm = sc.transform(df_train_corr_l.drop('labels', axis=1))
+    #
+    # sc = MinMaxScaler().fit(df_train_corr_r.drop('labels', axis=1))
+    # dump(sc, os.path.join(OUTPUT_DIR_FS,'sc_train_corr_r_regminmax.joblib'))
+    # Xtrain_corr_r_norm = sc.transform(df_train_corr_r.drop('labels', axis=1))
+    #
+    # ## 2. Perform Feature selection
+    # # Feature selection classifiers
     norm_type = 'minmaxreg'
-    if not os.path.isdir(os.path.join(OUTPUT_DIR_FS, norm_type)):
-        os.mkdir(os.path.join(OUTPUT_DIR_FS, norm_type))
-
-    MAX_ITR=1000000
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    Xtrain_rf, ytrain, rfetrain_rf = select_features(rf,Xtrain_norm,
-                                                     df_train['labels'].values,
-                                                     scoring_metric='balanced_accuracy',
-                                                     save_file=False)
-    dump(rfetrain_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'Xtrain_rf.npy'), Xtrain_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'ytrain.npy'), ytrain)
-
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    Xtrain_corr_rf, ytrain_corr, rfetrain_corr_rf = select_features(rf,Xtrain_corr_norm,
-                                                     df_train_corr['labels'].values,
-                                                     scoring_metric='balanced_accuracy',
-                                                     save_file=False)
-    dump(rfetrain_corr_rf,os.path.join(OUTPUT_DIR_FS,norm_type, 'rfetrain_corr_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'Xtrain_corr_rf.npy'), Xtrain_corr_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'ytrain_corr.npy'), ytrain_corr)
-
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    Xtrain_corr_l_rf, ytrain_corr_l, rfetrain_corr_l_rf = select_features(rf,Xtrain_corr_l_norm,
-                                                     df_train_corr_l['labels'].values,
-                                                     scoring_metric='balanced_accuracy',
-                                                     save_file=False)
-    dump(rfetrain_corr_l_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_rf.npy'), Xtrain_corr_l_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
-
-
-    rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
-    Xtrain_corr_r_rf, ytrain_corr_r, rfetrain_corr_r_rf = select_features(rf,Xtrain_corr_r_norm,
-                                                     df_train_corr_r['labels'].values,
-                                                     scoring_metric='balanced_accuracy',
-                                                     save_file=False)
-    dump(rfetrain_corr_r_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_rf.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_rf.npy'), Xtrain_corr_r_rf)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
-
-
-    svm = LinearSVC(max_iter=MAX_ITR)
-    Xtrain_svm, ytrain, rfetrain_svm = select_features(svm, Xtrain_norm,
-                                                     df_train['labels'].values,
-                                                     scoring_metric='balanced_accuracy',
-                                                     save_file=False)
-    dump(rfetrain_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_svm.npy'), Xtrain_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
-
-    svm = LinearSVC(max_iter=MAX_ITR)
-    Xtrain_corr_svm, ytrain_corr, rfetrain_corr_svm = select_features(svm, Xtrain_corr_norm,
-                                                                    df_train_corr['labels'].values,
-                                                                    scoring_metric='balanced_accuracy',
-                                                                    save_file=False)
-    dump(rfetrain_corr_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_svm.npy'), Xtrain_corr_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
-
-    svm = LinearSVC(max_iter=MAX_ITR)
-    Xtrain_corr_l_svm, ytrain_corr_l, rfetrain_corr_l_svm = select_features(svm, Xtrain_corr_l_norm,
-                                                                          df_train_corr_l['labels'].values,
-                                                                          scoring_metric='balanced_accuracy',
-                                                                          save_file=False)
-    dump(rfetrain_corr_l_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_svm.npy'), Xtrain_corr_l_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
-
-    svm = LinearSVC(max_iter=MAX_ITR)
-    Xtrain_corr_r_svm, ytrain_corr_r, rfetrain_corr_r_svm = select_features(svm, Xtrain_corr_r_norm,
-                                                                          df_train_corr_r['labels'].values,
-                                                                          scoring_metric='balanced_accuracy',
-                                                                          save_file=False)
-    dump(rfetrain_corr_r_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_svm.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_svm.npy'), Xtrain_corr_r_svm)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
-
-    # Lg All data
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR,solver='saga')
-    Xtrain_lg2, ytrain, rfetrain_lg2 = select_features(lg2, Xtrain_norm, df_train['labels'].values,
-                                                                          scoring_metric='balanced_accuracy',
-                                                                          save_file=False)
-    dump(rfetrain_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_lg2.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_lg2.npy'), Xtrain_lg2)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
-
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
-    Xtrain_lg1, ytrain, rfetrain_lg1 = select_features(lg1, Xtrain_norm, df_train['labels'].values,
-                                                                          scoring_metric='balanced_accuracy',
-                                                                          save_file=False)
-    dump(rfetrain_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_lg1.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_lg1.npy'), Xtrain_lg1)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
-
-    # LG uncorrelated data
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
-    Xtrain_corr_lg2, ytrain_corr, rfetrain_corr_lg2 = select_features(lg2, Xtrain_corr_norm,
-                                                                            df_train_corr['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_lg2.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_lg2.npy'), Xtrain_corr_lg2)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
-
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
-    Xtrain_corr_lg1, ytrain_corr, rfetrain_corr_lg1 = select_features(lg1, Xtrain_corr_norm,
-                                                                            df_train_corr['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_lg1.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_lg1.npy'), Xtrain_corr_lg1)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
-
-    # LG left hemisphere data
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
-    Xtrain_corr_l_lg2, ytrain_corr_l, rfetrain_corr_l_lg2 = select_features(lg2, Xtrain_corr_l_norm,
-                                                                            df_train_corr_l['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_l_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_lg2.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_lg2.npy'), Xtrain_corr_l_lg2)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
-
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
-    Xtrain_corr_l_lg1, ytrain_corr_l, rfetrain_corr_l_lg1 = select_features(lg1, Xtrain_corr_l_norm,
-                                                                            df_train_corr_l['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_l_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_lg1.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_lg1.npy'), Xtrain_corr_l_lg1)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
-
-
-    # LG Right hemisphere data
-    lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR,solver='saga')
-    Xtrain_corr_r_lg2, ytrain_corr_r, rfetrain_corr_r_lg2 = select_features(lg2, Xtrain_corr_r_norm,
-                                                                            df_train_corr_r['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_r_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_lg2.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_lg2.npy'), Xtrain_corr_r_lg2)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
-
-    lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
-    Xtrain_corr_r_lg1, ytrain_corr_r, rfetrain_corr_r_lg1 = select_features(lg1, Xtrain_corr_r_norm,
-                                                                            df_train_corr_l['labels'].values,
-                                                                            scoring_metric='balanced_accuracy',
-                                                                            save_file=False)
-    dump(rfetrain_corr_r_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_lg1.joblib'))
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_lg1.npy'), Xtrain_corr_r_lg1)
-    np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
+    # if not os.path.isdir(os.path.join(OUTPUT_DIR_FS, norm_type)):
+    #     os.mkdir(os.path.join(OUTPUT_DIR_FS, norm_type))
+    #
+    # MAX_ITR=1000000
+    # rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+    # Xtrain_rf, ytrain, rfetrain_rf = select_features(rf,Xtrain_norm,
+    #                                                  df_train['labels'].values,
+    #                                                  scoring_metric='balanced_accuracy',
+    #                                                  save_file=False)
+    # dump(rfetrain_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_rf.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'Xtrain_rf.npy'), Xtrain_rf)
+    # np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'ytrain.npy'), ytrain)
+    #
+    # rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+    # Xtrain_corr_rf, ytrain_corr, rfetrain_corr_rf = select_features(rf,Xtrain_corr_norm,
+    #                                                  df_train_corr['labels'].values,
+    #                                                  scoring_metric='balanced_accuracy',
+    #                                                  save_file=False)
+    # dump(rfetrain_corr_rf,os.path.join(OUTPUT_DIR_FS,norm_type, 'rfetrain_corr_rf.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'Xtrain_corr_rf.npy'), Xtrain_corr_rf)
+    # np.save(os.path.join(OUTPUT_DIR_FS,norm_type, 'ytrain_corr.npy'), ytrain_corr)
+    #
+    # rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+    # Xtrain_corr_l_rf, ytrain_corr_l, rfetrain_corr_l_rf = select_features(rf,Xtrain_corr_l_norm,
+    #                                                  df_train_corr_l['labels'].values,
+    #                                                  scoring_metric='balanced_accuracy',
+    #                                                  save_file=False)
+    # dump(rfetrain_corr_l_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_rf.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_rf.npy'), Xtrain_corr_l_rf)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
+    #
+    #
+    # rf = RandomForestClassifier(n_estimators=250, max_depth=5000)
+    # Xtrain_corr_r_rf, ytrain_corr_r, rfetrain_corr_r_rf = select_features(rf,Xtrain_corr_r_norm,
+    #                                                  df_train_corr_r['labels'].values,
+    #                                                  scoring_metric='balanced_accuracy',
+    #                                                  save_file=False)
+    # dump(rfetrain_corr_r_rf,os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_rf.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_rf.npy'), Xtrain_corr_r_rf)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
+    #
+    #
+    # svm = LinearSVC(max_iter=MAX_ITR)
+    # Xtrain_svm, ytrain, rfetrain_svm = select_features(svm, Xtrain_norm,
+    #                                                  df_train['labels'].values,
+    #                                                  scoring_metric='balanced_accuracy',
+    #                                                  save_file=False)
+    # dump(rfetrain_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_svm.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_svm.npy'), Xtrain_svm)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
+    #
+    # svm = LinearSVC(max_iter=MAX_ITR)
+    # Xtrain_corr_svm, ytrain_corr, rfetrain_corr_svm = select_features(svm, Xtrain_corr_norm,
+    #                                                                 df_train_corr['labels'].values,
+    #                                                                 scoring_metric='balanced_accuracy',
+    #                                                                 save_file=False)
+    # dump(rfetrain_corr_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_svm.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_svm.npy'), Xtrain_corr_svm)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
+    #
+    # svm = LinearSVC(max_iter=MAX_ITR)
+    # Xtrain_corr_l_svm, ytrain_corr_l, rfetrain_corr_l_svm = select_features(svm, Xtrain_corr_l_norm,
+    #                                                                       df_train_corr_l['labels'].values,
+    #                                                                       scoring_metric='balanced_accuracy',
+    #                                                                       save_file=False)
+    # dump(rfetrain_corr_l_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_svm.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_svm.npy'), Xtrain_corr_l_svm)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
+    #
+    # svm = LinearSVC(max_iter=MAX_ITR)
+    # Xtrain_corr_r_svm, ytrain_corr_r, rfetrain_corr_r_svm = select_features(svm, Xtrain_corr_r_norm,
+    #                                                                       df_train_corr_r['labels'].values,
+    #                                                                       scoring_metric='balanced_accuracy',
+    #                                                                       save_file=False)
+    # dump(rfetrain_corr_r_svm, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_svm.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_svm.npy'), Xtrain_corr_r_svm)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
+    #
+    # # Lg All data
+    # lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR,solver='saga')
+    # Xtrain_lg2, ytrain, rfetrain_lg2 = select_features(lg2, Xtrain_norm, df_train['labels'].values,
+    #                                                                       scoring_metric='balanced_accuracy',
+    #                                                                       save_file=False)
+    # dump(rfetrain_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_lg2.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_lg2.npy'), Xtrain_lg2)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
+    #
+    # lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
+    # Xtrain_lg1, ytrain, rfetrain_lg1 = select_features(lg1, Xtrain_norm, df_train['labels'].values,
+    #                                                                       scoring_metric='balanced_accuracy',
+    #                                                                       save_file=False)
+    # dump(rfetrain_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_lg1.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_lg1.npy'), Xtrain_lg1)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain.npy'), ytrain)
+    #
+    # # LG uncorrelated data
+    # lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
+    # Xtrain_corr_lg2, ytrain_corr, rfetrain_corr_lg2 = select_features(lg2, Xtrain_corr_norm,
+    #                                                                         df_train_corr['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_lg2.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_lg2.npy'), Xtrain_corr_lg2)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
+    #
+    # lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR, solver='saga')
+    # Xtrain_corr_lg1, ytrain_corr, rfetrain_corr_lg1 = select_features(lg1, Xtrain_corr_norm,
+    #                                                                         df_train_corr['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_lg1.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_lg1.npy'), Xtrain_corr_lg1)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr.npy'), ytrain_corr)
+    #
+    # # LG left hemisphere data
+    # lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR, solver='saga')
+    # Xtrain_corr_l_lg2, ytrain_corr_l, rfetrain_corr_l_lg2 = select_features(lg2, Xtrain_corr_l_norm,
+    #                                                                         df_train_corr_l['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_l_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_lg2.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_lg2.npy'), Xtrain_corr_l_lg2)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
+    #
+    # lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
+    # Xtrain_corr_l_lg1, ytrain_corr_l, rfetrain_corr_l_lg1 = select_features(lg1, Xtrain_corr_l_norm,
+    #                                                                         df_train_corr_l['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_l_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_l_lg1.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_l_lg1.npy'), Xtrain_corr_l_lg1)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_l.npy'), ytrain_corr_l)
+    #
+    #
+    # # LG Right hemisphere data
+    # lg2 = LogisticRegression(penalty='l2', max_iter=MAX_ITR,solver='saga')
+    # Xtrain_corr_r_lg2, ytrain_corr_r, rfetrain_corr_r_lg2 = select_features(lg2, Xtrain_corr_r_norm,
+    #                                                                         df_train_corr_r['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_r_lg2, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_lg2.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_lg2.npy'), Xtrain_corr_r_lg2)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
+    #
+    # lg1 = LogisticRegression(penalty='l1', max_iter=MAX_ITR,solver='saga')
+    # Xtrain_corr_r_lg1, ytrain_corr_r, rfetrain_corr_r_lg1 = select_features(lg1, Xtrain_corr_r_norm,
+    #                                                                         df_train_corr_l['labels'].values,
+    #                                                                         scoring_metric='balanced_accuracy',
+    #                                                                         save_file=False)
+    # dump(rfetrain_corr_r_lg1, os.path.join(OUTPUT_DIR_FS, norm_type, 'rfetrain_corr_r_lg1.joblib'))
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'Xtrain_corr_r_lg1.npy'), Xtrain_corr_r_lg1)
+    # np.save(os.path.join(OUTPUT_DIR_FS, norm_type, 'ytrain_corr_r.npy'), ytrain_corr_r)
 
     ## 3. Perform ML
     # Load data
